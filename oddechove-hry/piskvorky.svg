@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-label="Piškvorky Deluxe">
+  <defs><linearGradient id="b" x2="1" y2="1"><stop stop-color="#111d3b"/><stop offset="1" stop-color="#3c1d63"/></linearGradient><linearGradient id="s" x2="1" y2="1"><stop stop-color="#533b9b"/><stop offset="1" stop-color="#263d76"/></linearGradient></defs>
+  <rect width="760" height="420" rx="28" fill="url(#b)"/>
+  <g fill="#bd9ffe" opacity=".28"><circle cx="100" cy="88" r="4"/><circle cx="645" cy="315" r="5"/><circle cx="670" cy="70" r="3"/></g>
+  <text x="380" y="55" font-family="-apple-system,Arial,sans-serif" font-size="31" text-anchor="middle" font-weight="800" fill="#fff">Piškvorky Deluxe</text>
+  <g fill="url(#s)" stroke="#9f84df" stroke-width="3">
+    <rect x="230" y="90" width="90" height="90" rx="17"/><rect x="334" y="90" width="90" height="90" rx="17"/><rect x="438" y="90" width="90" height="90" rx="17"/>
+    <rect x="230" y="194" width="90" height="90" rx="17"/><rect x="334" y="194" width="90" height="90" rx="17"/><rect x="438" y="194" width="90" height="90" rx="17"/>
+    <rect x="230" y="298" width="90" height="90" rx="17"/><rect x="334" y="298" width="90" height="90" rx="17"/><rect x="438" y="298" width="90" height="90" rx="17"/>
+  </g>
+  <g font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif" font-size="54" text-anchor="middle"><text x="275" y="153">🦁</text><text x="379" y="153">🐶</text><text x="483" y="153">🦁</text><text x="275" y="257">🐶</text><text x="379" y="257">🦁</text><text x="483" y="361">🦁</text></g>
+  <path d="M247 113 L485 354" stroke="#b7ff92" stroke-width="7" stroke-linecap="round" opacity=".8"/>
+</svg>

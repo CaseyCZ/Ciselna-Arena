@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-label="Pong Fotbal – hřiště na výšku, červená pálka nahoře a modrá dole">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#092333"/><stop offset="1" stop-color="#08151f"/></linearGradient>
+    <linearGradient id="pitch" x2="1" y2="1"><stop stop-color="#146944"/><stop offset="1" stop-color="#0e4f37"/></linearGradient>
+    <linearGradient id="blue"><stop stop-color="#28cafa"/><stop offset="1" stop-color="#4fbaff"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="7"/></filter>
+  </defs>
+  <rect width="760" height="420" rx="28" fill="url(#bg)"/>
+  <text x="106" y="81" font-size="27" font-weight="800" fill="#f5faff" font-family="Arial,sans-serif">⚽ PONG</text>
+  <text x="106" y="113" font-size="27" font-weight="800" fill="#f5faff" font-family="Arial,sans-serif">FOTBAL</text>
+  <text x="105" y="181" font-size="15" fill="#a4cbdb" font-family="Arial,sans-serif">🔴 NAHOŘE</text>
+  <text x="105" y="206" font-size="19" fill="#ff917e" font-family="Arial,sans-serif" font-weight="700">Počítač / hráč 2</text>
+  <text x="105" y="288" font-size="15" fill="#a4cbdb" font-family="Arial,sans-serif">🔵 DOLE</text>
+  <text x="105" y="313" font-size="19" fill="#61d6ff" font-family="Arial,sans-serif" font-weight="700">Hráč 1</text>
+  <rect x="342" y="25" width="244" height="370" rx="16" fill="url(#pitch)" stroke="#348463" stroke-width="3"/>
+  <g fill="#ffffff" opacity=".035">
+    <rect x="366" y="28" width="44" height="363"/><rect x="455" y="28" width="44" height="363"/><rect x="542" y="28" width="41" height="363"/>
+  </g>
+  <g fill="none" stroke="#d4ffe1" stroke-width="2.5" opacity=".62">
+    <rect x="354" y="37" width="220" height="346"/>
+    <path d="M354 210 H574"/>
+    <circle cx="464" cy="210" r="42"/>
+    <rect x="414" y="37" width="100" height="44"/><rect x="441" y="37" width="46" height="16"/>
+    <rect x="414" y="339" width="100" height="44"/><rect x="441" y="367" width="46" height="16"/>
+  </g>
+  <rect x="423" y="60" width="82" height="14" rx="7" fill="#ff8576" opacity=".45" filter="url(#glow)"/>
+  <rect x="423" y="60" width="82" height="14" rx="7" fill="#ff8576"/>
+  <rect x="415" y="347" width="88" height="14" rx="7" fill="#40cfff" opacity=".45" filter="url(#glow)"/>
+  <rect x="415" y="347" width="88" height="14" rx="7" fill="url(#blue)"/>
+  <g fill="#ffffff" opacity=".25"><circle cx="452" cy="190" r="5"/><circle cx="456" cy="202" r="7"/><circle cx="459" cy="214" r="8"/></g>
+  <circle cx="462" cy="225" r="9" fill="#fff"/><circle cx="462" cy="225" r="3.8" fill="#142d3b"/>
+  <text x="630" y="374" font-size="14" fill="#93b5c2" text-anchor="middle" font-family="Arial,sans-serif">1–2 hráči</text>
+</svg>

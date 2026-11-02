@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="color-scheme" content="dark">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+  body { --accent:#a78bfa; --accent2:#6366f1; --glow:rgba(167,139,250,.25);
+    margin:0; color:#f7f5ff; min-height:100dvh; background:#0b0c1a;
+    background-image:radial-gradient(ellipse at 50% 8%,var(--glow),transparent 60%),
+      linear-gradient(160deg,#12142b,#090a16 68%); }
+  body[data-theme="ocean"] { --accent:#67e8f9;--accent2:#0284c7;--glow:rgba(34,211,238,.23); }
+  body[data-theme="sunset"] { --accent:#fdba74;--accent2:#e879f9;--glow:rgba(251,146,60,.22); }
+  button,input,select { font:inherit; }
+  button { touch-action:manipulation; cursor:pointer; }
+  .shell { max-width:510px; margin:auto; min-height:100dvh;
+    padding:calc(env(safe-area-inset-top) + 22px) 18px calc(env(safe-area-inset-bottom) + 24px);
+    display:flex; flex-direction:column; gap:18px; }
+  .top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .eyebrow { color:var(--accent);font-size:11px;letter-spacing:2.5px;font-weight:900; }
+  h1 { margin:4px 0 0;font-size:27px;letter-spacing:-1.2px;line-height:1.1; }
+  .gear { border:1px solid #ffffff22; background:#ffffff0c;color:white;
+    border-radius:16px; width:48px;height:48px;font-size:22px; }
+  .mode { display:grid;grid-template-columns:1fr 1fr;padding:5px;gap:5px;
+    border:1px solid #ffffff12;border-radius:17px;background:#ffffff0c; }
+  .mode button { border:0;border-radius:12px;background:transparent;color:#9699b6;
+    font-weight:750;padding:12px 8px;font-size:14px; }
+  .mode button.active { background:linear-gradient(135deg,var(--accent2),#6657b7);
+    color:white;box-shadow:0 4px 15px #0004; }
+  .scorebar { display:grid;grid-template-columns:1fr .75fr 1fr;gap:10px; }
+  .score { text-align:center;background:#ffffff0b;border:1px solid #ffffff14;
+    padding:11px 4px;border-radius:17px;min-width:0; }
+  .score .caption {font-size:11px;color:#a6a8c3;font-weight:700;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .score .number {font-weight:850;font-size:28px;margin-top:3px;font-variant-numeric:tabular-nums;}
+  .score.primary {border-color:var(--accent2);background:linear-gradient(145deg,#ffffff11,#ffffff04);}
+  .status {text-align:center;min-height:48px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:3px;}
+  #status {font-size:19px;font-weight:850;}
+  #hint {font-size:12px;color:#9fa3bf;}
+  .board { width:min(92vw,var(--limit)); aspect-ratio:1;align-self:center;
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));
+    gap:10px; }
+  .board[data-size="small"] { --limit:285px;--symbol:49px; }
+  .board[data-size="medium"] { --limit:355px;--symbol:62px; }
+  .board[data-size="large"] { --limit:440px;--symbol:77px; }
+  .cell { min-width:0;min-height:0;border-radius:21px;border:1px solid #ffffff20;
+    background:linear-gradient(145deg,#282941,#17182e); color:white;
+    box-shadow:inset 0 1px 0 #ffffff14,0 8px 16px #0003;
+    font-size:min(var(--symbol),17vw);display:flex;align-items:center;justify-content:center;
+    transition:transform .12s,border-color .18s,background .18s; }
+  .cell:active:not(:disabled) {transform:scale(.94);background:#383956;}
+  .cell:disabled {opacity:1;}
+  .cell.played { animation:pop .21s ease-out; }
+  .cell.win {border:3px solid var(--player-accent,var(--accent));
+    background:linear-gradient(145deg,#514170,#28243e);
+    box-shadow:0 0 24px var(--player-accent,var(--accent)),inset 0 0 20px var(--glow);
+    animation:winPulse .85s ease-in-out 5; }
+  .cell.empty {color:#777d9f;}
+  @keyframes pop { from {transform:scale(.68);opacity:.5}to{transform:scale(1);opacity:1} }
+  @keyframes winPulse { 45% {transform:scale(.90);filter:brightness(1.7);box-shadow:0 0 38px var(--player-accent,var(--accent));} }
+  .confetti {position:fixed;inset:0;z-index:8;pointer-events:none;overflow:hidden;}
+  .confetti span {position:absolute;top:var(--top);left:var(--left);width:var(--size);height:var(--height);
+    background:var(--piece-color);border-radius:2px;opacity:1;animation:confettiFall var(--duration) linear var(--delay) forwards;}
+  @keyframes confettiFall {0% {transform:translate3d(0,-25px,0) rotate(0deg);opacity:1} 100% {transform:translate3d(var(--drift),78vh,0) rotate(850deg);opacity:0}}
+  .win-banner {align-self:stretch;text-align:center;padding:11px 14px;border-radius:15px;
+    border:1px solid var(--accent);background:linear-gradient(110deg,#293046,#4c3153,#293046);
+    color:#fff4ca;font-weight:850;box-shadow:0 6px 22px #0006;animation:winBannerIn .45s ease-out;}
+  @keyframes winBannerIn {from {transform:scale(.82);opacity:0}to {transform:scale(1);opacity:1}}
+  @media(prefers-reduced-motion:reduce) {.cell.win{animation:none}.confetti span{animation:none;display:none}}
+  @media(prefers-reduced-motion:reduce) {.win-banner{animation:none}}
+  .bottom {display:block;}
+  .primarybtn {border:0;background:linear-gradient(135deg,var(--accent2),#6864df);color:white;
+    padding:15px 18px;border-radius:16px;font-weight:850;box-shadow:0 8px 20px #0005;width:100%;}
+  .outline {border:1px solid #ffffff25;background:#ffffff10;color:white;padding:12px 16px;
+    border-radius:16px;font-weight:800;}
+  .difficulty {display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap;}
+  .difficulty label {font-size:12px;color:#9296b5;margin-right:3px;}
+  .settings-difficulty {justify-content:flex-start;}
+  .chip {padding:8px 12px;border-radius:999px;border:1px solid #ffffff22;
+    color:#b6b9d1;background:#ffffff0c;font-size:12px;font-weight:800;}
+  .chip.selected {background:var(--accent);border-color:var(--accent);color:#111124;}
+  .foot {text-align:center;font-size:11px;color:#696e90;margin-top:auto;padding-top:4px;}
+  .overlay {position:fixed;inset:0;z-index:10;background:#03050bc9;display:flex;
+    align-items:flex-end;justify-content:center;backdrop-filter:blur(10px);}
+  [hidden] {display:none !important;}
+  .panel {width:100%;max-width:510px;max-height:89dvh;overflow:auto;background:#1a1c30;
+    border:1px solid #ffffff24;border-radius:27px 27px 0 0;
+    padding:24px 22px calc(env(safe-area-inset-bottom) + 25px); }
+  .panelhead {display:flex;align-items:center;justify-content:space-between;}
+  .panelhead h2 {margin:0;font-size:23px;}
+  .app-about {display:flex;align-items:center;gap:13px;padding:14px;margin-top:18px;
+    border:1px solid #ffffff24;border-radius:17px;background:linear-gradient(125deg,#39345b,#1c2138);}
+  .app-logo {width:57px;height:57px;flex-shrink:0;display:grid;place-items:center;
+    font-size:31px;border-radius:17px;background:linear-gradient(135deg,#a78bfa,#5b5dc9);
+    box-shadow:0 8px 18px #0006;}
+  .app-about strong {display:block;font-size:16px;margin-bottom:4px;}
+  .app-about .version {font-size:12px;color:#ded4ff;font-weight:800;}
+  .app-about .update-note {font-size:11px;color:#aeb4ce;margin-top:3px;line-height:1.4;}
+  .close {width:35px;height:35px;border:0;border-radius:50%;background:#ffffff16;color:white;font-size:20px;}
+  .setting {margin-top:21px;}
+  .setting label {display:block;color:#bcc0d6;font-size:12px;font-weight:800;margin-bottom:10px;}
+  .choices {display:flex;gap:8px;flex-wrap:wrap;}
+  .choices button {border:1px solid #ffffff26;background:#ffffff10;color:white;border-radius:12px;padding:11px 13px;}
+  .choices button.chosen {border-color:var(--accent);background:#ffffff22;}
+  .iconpick {display:flex;gap:12px;}
+  .iconpick button {flex:1;background:#ffffff0d;border:1px solid #ffffff28;
+    border-radius:15px;padding:12px;color:white;font-size:25px;}
+  .iconpick small {display:block;font-size:11px;color:#a8adca;margin-bottom:4px;}
+  .profile {background:#ffffff09;border:1px solid #ffffff1a;border-radius:17px;padding:13px;margin-top:10px;}
+  .profilehead {display:flex;align-items:center;gap:10px;}
+  .profilehead .avatar {flex:0 0 54px;font-size:27px;padding:10px 4px;}
+  .profile input {flex:1;min-width:0;background:#111426;border:1px solid #ffffff2b;border-radius:12px;
+    color:white;padding:12px;font-size:15px;font-weight:700;}
+  .profile .stats {font-size:11px;color:#aab0c9;line-height:1.6;margin-top:12px;}
+  .setting > .stats {font-size:11px;color:#aab0c9;line-height:1.5;margin-top:9px;}
+  .colors {display:flex;gap:8px;flex-wrap:wrap;margin-top:11px;}
+  .colors button {width:25px;height:25px;border-radius:50%;border:2px solid transparent;padding:0;}
+  .colors button.selected {outline:2px solid white;outline-offset:2px;}
+  .picker {margin-top:15px;background:#101223;padding:12px;border-radius:16px;}
+  .emojis {display:grid;grid-template-columns:repeat(6,1fr);gap:5px;}
+  .emojis button {border:0;background:#ffffff12;border-radius:10px;font-size:24px;padding:9px 0;}
+  .custom {display:flex;gap:8px;margin-top:12px;}
+  .custom input {min-width:0;flex:1;background:#ffffff12;border:1px solid #ffffff25;border-radius:10px;
+    color:white;font-size:17px;padding:10px;}
+  .custom button {background:var(--accent);color:#101020;border:0;border-radius:10px;font-weight:800;padding:0 14px;}
+  .toggle {display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .switch {border:1px solid #ffffff28;color:white;background:#ffffff16;border-radius:999px;padding:10px 17px;}
+  .danger {width:100%;margin-top:26px;color:#fca5a5;border:1px solid #f871713d;
+    background:#f8717110;border-radius:13px;padding:12px;font-weight:800;}
+  .confirm-box {border:1px solid #ffffff32;background:#ffffff12;border-radius:15px;
+    padding:12px;margin-top:10px;font-size:13px;line-height:1.4;}
+  .confirm-actions {display:flex;gap:8px;margin-top:12px;}
+  .confirm-actions button {flex:1;border-radius:11px;border:1px solid #ffffff30;
+    padding:11px 8px;background:#ffffff16;color:white;font-weight:750;}
+  .confirm-actions button.danger-action {background:#bf4545;color:white;border-color:#e17878;}
+  @media(max-height:735px) { .shell {gap:11px;padding-top:calc(env(safe-area-inset-top) + 10px);} .score {padding:7px 4px;} .status {min-height:37px;} }
+
+    .arena-top-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
+    .arena-back{width:42px;height:42px;border:1px solid #ffffff35;border-radius:12px;
+      background:#ffffff12;color:#fff;display:grid;place-items:center;text-decoration:none;
+      font:700 23px/1 system-ui,sans-serif;flex-shrink:0}
+    .arena-back:hover,.arena-back:focus-visible{background:#ffffff28;border-color:#ffffff88}
+    @media(max-width:370px){.arena-top-actions{gap:5px}.arena-back{width:36px;height:42px}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="top"><div><div class="eyebrow">DELUXE EDITION</div><h1>Piškvorky <span aria-hidden="true">✨</span></h1></div><div class="arena-top-actions"><a class="arena-back" href="./" aria-label="Zpět na oddechové hry" title="Zpět na oddechové hry">←</a><button class="gear" id="settings" aria-label="Nastavení">⚙️</button></div></header>
+  <nav class="mode" aria-label="Režim hry"><button id="humanMode">👥 Dva hráči</button><button id="aiMode">🤖 Proti AI</button></nav>
+  <div class="scorebar">
+    <div class="score primary" id="scoreCard1"><div class="caption" id="label1">HRÁČ 1</div><div class="number" id="score1">0</div></div>
+    <div class="score"><div class="caption">REMÍZY</div><div class="number" id="ties">0</div></div>
+    <div class="score" id="scoreCard2"><div class="caption" id="label2">POČÍTAČ</div><div class="number" id="score2">0</div></div>
+  </div>
+  <div class="status" aria-live="polite"><div id="status">Jsi na tahu</div><div id="hint">Vyber jedno políčko</div></div>
+  <div id="winBanner" class="win-banner" role="status" hidden>🎉 Skvělá výhra! 🏆</div>
+  <main id="board" class="board" role="group" aria-label="Hrací pole 3 krát 3"></main>
+  <div class="bottom"><button class="primarybtn" id="newGame">↻ Nová hra</button>
+   <div id="newGameConfirm" class="confirm-box" hidden>Rozehraná partie se ukončí. Opravdu začít znovu?
+    <div class="confirm-actions"><button id="keepGame">Pokračovat</button><button id="discardGame" class="danger-action">Nová hra</button></div>
+   </div>
+  </div>
+  <div class="foot">Hraješ offline · Nastavení a výsledky se ukládají</div>
+</div>
+
+<div id="confetti" class="confetti" aria-hidden="true"></div>
+<div id="overlay" class="overlay" hidden>
+ <section class="panel" role="dialog" aria-modal="true" aria-label="Nastavení hry">
+  <div class="panelhead"><h2>⚙️ Nastavení</h2><button class="close" id="closeSettings" aria-label="Zavřít">×</button></div>
+  <div class="app-about"><div class="app-logo" aria-hidden="true">🎮</div><div><strong>Piškvorky Deluxe</strong><div id="appVersion" class="version"></div><div id="updateStatus" class="update-note"></div></div></div>
+  <div class="setting"><label>PROFILY HRÁČŮ</label>
+   <div class="profile"><div class="profilehead"><button type="button" class="avatar outline" id="icon1" aria-label="Změnit ikonu hráče 1">🦁</button><input id="name1" maxlength="18" placeholder="Jméno hráče 1" aria-label="Jméno hráče 1"></div><div class="colors" id="colors1" aria-label="Barva hráče 1"></div><div class="stats" id="stats1"></div></div>
+   <div class="profile"><div class="profilehead"><button type="button" class="avatar outline" id="icon2" aria-label="Změnit ikonu hráče 2">🐶</button><input id="name2" maxlength="18" placeholder="Jméno hráče 2" aria-label="Jméno hráče 2"></div><div class="colors" id="colors2" aria-label="Barva hráče 2"></div><div class="stats" id="stats2"></div></div>
+   <div class="picker" id="picker" hidden><div class="emojis" id="emojis"></div><div class="custom"><input id="customIcon" placeholder="Vlastní emoji (např. 🚀)" maxlength="16"><button id="setCustom">Použít</button></div></div>
+  </div>
+  <div class="setting"><label>VELIKOST HRACÍ PLOCHY</label><div class="choices" id="sizeChoices"><button data-size="small">Malá</button><button data-size="medium">Střední</button><button data-size="large">Velká</button></div></div>
+  <div class="setting"><label>BAREVNÝ STYL</label><div class="choices" id="themeChoices"><button data-theme="violet">💜 Fialový</button><button data-theme="ocean">💎 Modrý</button><button data-theme="sunset">🌅 Západ</button></div></div>
+  <div class="setting"><label>KDO ZAČÍNÁ NOVOU HRU</label><div class="choices" id="starterChoices"><button data-starter="alternate">🔁 Střídavě</button><button data-starter="1">Hráč 1</button><button data-starter="2">Hráč 2 / AI</button></div><div class="stats">Střídání platí od příští nové hry a funguje i proti počítači.</div></div>
+  <div class="setting" id="difficultySetting"><label>OBTÍŽNOST POČÍTAČE</label><div id="difficultyBar" class="difficulty settings-difficulty"><button class="chip" data-difficulty="easy">Lehká</button><button class="chip" data-difficulty="medium">Střední</button><button class="chip" data-difficulty="hard">Těžká</button></div></div>
+  <div class="setting toggle"><div><label>ZVUKY</label><div style="font-size:12px;color:#8f94b1">Tahy, výhra i remíza</div></div><button id="soundSetting" class="switch">Zapnuto</button></div>
+  <button id="resetScores" class="danger">Vynulovat výsledky</button>
+  <div id="resetConfirm" class="confirm-box" hidden>Opravdu smazat všechny výsledky v obou režimech?
+   <div class="confirm-actions"><button id="cancelReset">Zrušit</button><button id="confirmReset" class="danger-action">Ano, vynulovat</button></div>
+  </div>
+ </section>
+</div>
+
+<script>
+const ICONS = ["🦁","🐶","🐱","🐼","🦊","🐸","🐵","🐯","🦄","🐲","🐙","🦋","❌","⭕","⭐️","🔥","❤️","💙"];
+const APP_VERSION_LABEL = "1.1.0";
+const UPDATE_STATUS_LABEL = "Webová verze se aktualizuje automaticky.";
+const COLORS = {purple:"#a78bfa",cyan:"#67e8f9",pink:"#f9a8d4",orange:"#fdba74",lime:"#bef264"};
+const COLOR_NAMES = {purple:"Fialová",cyan:"Tyrkysová",pink:"Růžová",orange:"Oranžová",lime:"Zelená"};
+const defaults = {
+  mode:"ai",difficulty:"medium",size:"medium",theme:"violet",icons:["🦁","🐶"],emptyIcon:"",sound:true,starts:1,
+  startMode:"alternate",lastStarter:{ai:1,human:1},
+  profiles:[{name:"Hráč 1",color:"purple"},{name:"Hráč 2",color:"cyan"}],
+  board:[0,0,0,0,0,0,0,0,0],current:1,scores:{ai:[0,0,0],human:[0,0,0]}
+};
+const supplied = (()=>{try{return JSON.parse(localStorage.getItem("piskvorky_deluxe_backup")||"{}")||{}}catch{return {}}})();
+let state = Object.assign({},defaults,supplied);
+if (!Array.isArray(state.icons) || state.icons.length !== 2 || state.icons.some(x => typeof x !== "string" || !x) || state.icons[0] === state.icons[1]) state.icons = ["🦁","🐶"];
+if (!Array.isArray(state.board) || state.board.length !== 9 || state.board.some(x => ![0,1,2].includes(x))) state.board = Array(9).fill(0);
+if (!["ai","human"].includes(state.mode)) state.mode = "ai";
+if (!["easy","medium","hard"].includes(state.difficulty)) state.difficulty = "medium";
+if (!["small","medium","large"].includes(state.size)) state.size = "medium";
+if (!["violet","ocean","sunset"].includes(state.theme)) state.theme = "violet";
+if (![1,2].includes(state.starts)) state.starts = 1;
+if (![1,2].includes(state.current)) state.current = 1;
+if (!["fixed","alternate"].includes(state.startMode)) state.startMode = "alternate";
+if (!state.lastStarter || typeof state.lastStarter !== "object") state.lastStarter = {ai:state.starts,human:state.starts};
+for (const key of ["ai","human"]) if (![1,2].includes(state.lastStarter[key])) state.lastStarter[key]=state.starts;
+if (!Array.isArray(state.profiles) || state.profiles.length !== 2) state.profiles = defaults.profiles.map(p=>Object.assign({},p));
+state.profiles = state.profiles.map((p,i)=>({
+  name:p && typeof p.name === "string" && p.name.trim() ? p.name.trim().slice(0,18) : "Hráč "+(i+1),
+  color:p && Object.prototype.hasOwnProperty.call(COLORS,p.color) ? p.color : i === 0 ? "purple" : "cyan"
+}));
+if (!state.scores || typeof state.scores !== "object") state.scores = {};
+for (const key of ["ai","human"]) {
+  if (!Array.isArray(state.scores[key]) || state.scores[key].length !== 3 || state.scores[key].some(x => !Number.isSafeInteger(x) || x < 0)) state.scores[key] = [0,0,0];
+}
+
+window.__nativeMessages = [];
+window.__nativeWaiter = null;
+let aiTimer = null, confettiTimer = null, session = 0, pickerFor = 0, lastMove = -1, audioCtx = null;
+const el = id => document.getElementById(id);
+const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+function outcome(b) {
+  for (const line of lines) {
+    const [a,c,d] = line;
+    if (b[a] && b[a] === b[c] && b[a] === b[d]) return {winner:b[a],line:line,tie:false};
+  }
+  return {winner:0,line:[],tie:b.every(Boolean)};
+}
+function sendSave() {
+  const message = {type:"save",data:JSON.stringify(state)};
+  if (window.__nativeWaiter) {
+    const done = window.__nativeWaiter;
+    window.__nativeWaiter = null;
+    done(message);
+  } else {
+    window.__nativeMessages = [message];
+  }
+  try { localStorage.setItem("piskvorky_deluxe_backup",message.data); } catch (_) {}
+}
+function playerName(player) {
+  return state.mode === "ai" && player === 2 ? "Počítač" : state.profiles[player-1].name;
+}
+function clearCelebration() {
+  clearTimeout(confettiTimer);
+  el("confetti").replaceChildren();
+}
+function celebrate(player) {
+  clearCelebration();
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const box=el("confetti"),palette=[COLORS[state.profiles[player-1].color],"#fff7be","#f9a8d4","#67e8f9","#e2d5ff"];
+  const pieces=document.createDocumentFragment();
+  for(let i=0;i<42;i++) {
+    const bit=document.createElement("span");
+    bit.style.setProperty("--left",(Math.random()*100).toFixed(1)+"%");
+    bit.style.setProperty("--size",(5+Math.random()*7).toFixed(0)+"px");
+    bit.style.setProperty("--height",(10+Math.random()*12).toFixed(0)+"px");
+    bit.style.setProperty("--top",(9+Math.random()*32).toFixed(0)+"vh");
+    bit.style.setProperty("--duration",(2.1+Math.random()*1.6).toFixed(2)+"s");
+    bit.style.setProperty("--delay",(Math.random()*.65).toFixed(2)+"s");
+    bit.style.setProperty("--drift",(Math.random()*180-90).toFixed(0)+"px");
+    bit.style.setProperty("--piece-color",palette[i%palette.length]);
+    pieces.appendChild(bit);
+  }
+  box.appendChild(pieces);
+  confettiTimer=setTimeout(clearCelebration,4500);
+}
+function tone(freq,duration,delay,kind) {
+  if (!state.sound) return;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!audioCtx) audioCtx = new AC();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    const now = audioCtx.currentTime + (delay || 0);
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.type = kind || "sine";osc.frequency.setValueAtTime(freq,now);
+    gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(.085,now+.012);
+    gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+    osc.connect(gain);gain.connect(audioCtx.destination);osc.start(now);osc.stop(now+duration+.03);
+  } catch (_) {}
+}
+function playSound(kind) {
+  if (kind === "win") {tone(520,.17,0);tone(660,.19,.13);tone(880,.29,.27);}
+  else if (kind === "draw") {tone(350,.18,0);tone(310,.28,.15);}
+  else if (kind === "ai") tone(410,.13,0,"triangle");
+  else tone(600,.12,0);
+}
+function available(b) {return b.map((v,i)=>v === 0 ? i : -1).filter(i=>i >= 0);}
+function randomMove(b) {const a=available(b);return a[Math.floor(Math.random()*a.length)];}
+function winningMove(b,p) {
+  for (const i of available(b)) {b[i]=p;const good=outcome(b).winner === p;b[i]=0;if (good) return i;}
+  return -1;
+}
+function minimax(b,p,depth) {
+  const r=outcome(b);
+  if (r.winner === 2) return {score:10-depth,move:-1};
+  if (r.winner === 1) return {score:depth-10,move:-1};
+  if (r.tie) return {score:0,move:-1};
+  let best=p === 2 ? -Infinity : Infinity, bestMoves=[];
+  for (const i of available(b)) {
+    b[i]=p;const score=minimax(b,p === 1 ? 2 : 1,depth+1).score;b[i]=0;
+    if ((p === 2 && score > best) || (p === 1 && score < best)) {best=score;bestMoves=[i];}
+    else if (score === best) bestMoves.push(i);
+  }
+  return {score:best,move:bestMoves[Math.floor(Math.random()*bestMoves.length)]};
+}
+function aiChoice() {
+  const b=state.board;
+  if (state.difficulty === "easy") return randomMove(b);
+  const win=winningMove(b,2);if (win >= 0) return win;
+  const block=winningMove(b,1);if (block >= 0) return block;
+  if (state.difficulty === "medium") return b[4] === 0 && Math.random()<.6 ? 4 : randomMove(b);
+  return minimax(b,2,0).move;
+}
+function scheduleAI() {
+  clearTimeout(aiTimer);
+  if (state.mode !== "ai" || state.current !== 2 || outcome(state.board).winner || outcome(state.board).tie) return;
+  const ticket=session;
+  aiTimer=setTimeout(() => {
+    if (ticket !== session || state.mode !== "ai" || state.current !== 2) return;
+    const index=aiChoice();if (index !== undefined && index >= 0) move(index,2);
+  },420);
+}
+function move(index,player) {
+  if (state.board[index] || state.current !== player) return;
+  const before=outcome(state.board);if (before.winner || before.tie) return;
+  state.board[index]=player;lastMove=index;
+  const after=outcome(state.board);
+  if (after.winner) state.scores[state.mode][after.winner-1]++;
+  else if (after.tie) state.scores[state.mode][2]++;
+  else state.current=player === 1 ? 2 : 1;
+  playSound(after.winner ? "win" : after.tie ? "draw" : player === 2 ? "ai" : "tap");
+  sendSave();render();if (after.winner) celebrate(after.winner);scheduleAI();
+}
+function newGame(skipConfirm) {
+  if (!skipConfirm && state.board.some(Boolean) && !outcome(state.board).winner && !outcome(state.board).tie) {
+    el("newGameConfirm").hidden=false;
+    return;
+  }
+  el("newGameConfirm").hidden=true;
+  clearTimeout(aiTimer);clearCelebration();session++;state.board=Array(9).fill(0);
+  state.current=state.startMode === "alternate" ? 3-state.lastStarter[state.mode] : state.starts;
+  state.lastStarter[state.mode]=state.current;lastMove=-1;
+  sendSave();render();scheduleAI();
+}
+function setMode(mode) {
+  if (state.mode === mode) return;
+  state.mode=mode;newGame(true);
+}
+function setOption(name,value) {
+  state[name]=value;sendSave();render();
+}
+function setProfileName(player,value) {
+  state.profiles[player-1].name=value.trim().slice(0,18) || "Hráč "+player;
+  sendSave();render();
+}
+function setProfileColor(player,color) {
+  if (!Object.prototype.hasOwnProperty.call(COLORS,color)) return;
+  state.profiles[player-1].color=color;sendSave();render();
+}
+function profileStats(player) {
+  const ai=state.scores.ai,human=state.scores.human;
+  if (player === 1) return "Výhry: "+(ai[0]+human[0])+" · Prohry: "+(ai[1]+human[1])+" · Remízy: "+(ai[2]+human[2])+" (oba režimy)";
+  return "Výhry: "+human[1]+" · Prohry: "+human[0]+" · Remízy: "+human[2]+" (dva hráči)";
+}
+function render() {
+  const r=outcome(state.board), s=state.scores[state.mode];
+  el("appVersion").textContent="Verze v"+APP_VERSION_LABEL;
+  el("updateStatus").textContent=UPDATE_STATUS_LABEL;
+  document.body.dataset.theme=state.theme;
+  el("board").dataset.size=state.size;
+  el("humanMode").classList.toggle("active",state.mode === "human");
+  el("aiMode").classList.toggle("active",state.mode === "ai");
+  el("difficultySetting").hidden=state.mode !== "ai";
+  document.querySelectorAll("[data-difficulty]").forEach(b=>b.classList.toggle("selected",b.dataset.difficulty === state.difficulty));
+  el("label1").textContent=state.icons[0]+" "+playerName(1).toUpperCase();
+  el("label2").textContent=state.icons[1]+" "+playerName(2).toUpperCase();
+  el("score1").textContent=s[0];el("score2").textContent=s[1];el("ties").textContent=s[2];
+  el("scoreCard1").style.borderColor=COLORS[state.profiles[0].color];
+  el("scoreCard2").style.borderColor=COLORS[state.profiles[1].color];
+  el("winBanner").hidden=!r.winner;
+  if (r.winner) {
+    el("status").textContent=state.icons[r.winner-1]+" Vyhrává "+playerName(r.winner)+"!";
+    el("hint").textContent="Zkus další partii";
+    el("winBanner").textContent="🎉 "+playerName(r.winner)+" vyhrává! 🏆 🎊";
+  }
+  else if (r.tie) {el("status").textContent="🤝 Remíza!";el("hint").textContent="To bylo těsné";}
+  else {el("status").textContent=state.mode === "ai" && state.current === 2 ? "🤖 Počítač přemýšlí…" : "Na tahu "+state.icons[state.current-1]+" "+playerName(state.current);el("hint").textContent=state.mode === "ai" && state.current === 1 ? "Teď hraješ ty" : "Vyber políčko";}
+  document.querySelectorAll(".cell").forEach((b,i)=>{
+    const val=state.board[i], canPlay=!val && !r.winner && !r.tie && !(state.mode === "ai" && state.current === 2);
+    b.textContent=val ? state.icons[val-1] : "";
+    b.disabled=!canPlay;
+    b.classList.toggle("empty",!val);
+    b.classList.toggle("win",r.line.includes(i));
+    b.classList.toggle("played",i === lastMove);
+    b.style.setProperty("--player-accent",COLORS[state.profiles[(val || r.winner || 1)-1].color]);
+    b.style.borderColor=val ? COLORS[state.profiles[val-1].color] : "";
+    b.setAttribute("aria-label",val ? "Pole "+(i+1)+": "+state.icons[val-1] : "Volné pole "+(i+1));
+  });
+  el("soundSetting").textContent=state.sound ? "Zapnuto" : "Vypnuto";
+  for(let i=1;i<=2;i++) {
+    el("icon"+i).textContent=state.icons[i-1];
+    if (document.activeElement !== el("name"+i)) el("name"+i).value=state.profiles[i-1].name;
+    el("stats"+i).textContent=profileStats(i);
+    document.querySelectorAll("#colors"+i+" button").forEach(b=>b.classList.toggle("selected",b.dataset.color === state.profiles[i-1].color));
+  }
+  document.querySelectorAll("#sizeChoices [data-size]").forEach(b=>b.classList.toggle("chosen",b.dataset.size === state.size));
+  document.querySelectorAll("[data-theme]").forEach(b=>b.classList.toggle("chosen",b.dataset.theme === state.theme));
+  document.querySelectorAll("[data-starter]").forEach(b=>b.classList.toggle("chosen",state.startMode === "alternate" ? b.dataset.starter === "alternate" : Number(b.dataset.starter) === state.starts));
+}
+
+for (let i=0;i<9;i++) {
+  const b=document.createElement("button");b.type="button";b.className="cell";
+  b.addEventListener("click",()=>move(i,state.current));el("board").appendChild(b);
+}
+el("newGame").addEventListener("click",()=>newGame(false));
+el("keepGame").addEventListener("click",()=>{el("newGameConfirm").hidden=true;});
+el("discardGame").addEventListener("click",()=>newGame(true));
+el("humanMode").addEventListener("click",()=>setMode("human"));
+el("aiMode").addEventListener("click",()=>setMode("ai"));
+document.querySelectorAll("[data-difficulty]").forEach(b=>b.addEventListener("click",()=>setOption("difficulty",b.dataset.difficulty)));
+el("soundSetting").addEventListener("click",()=>setOption("sound",!state.sound));
+el("settings").addEventListener("click",()=>{el("overlay").hidden=false;});
+el("closeSettings").addEventListener("click",()=>{el("overlay").hidden=true;el("picker").hidden=true;el("resetConfirm").hidden=true;});
+el("overlay").addEventListener("click",e=>{if(e.target === el("overlay"))el("closeSettings").click();});
+document.querySelectorAll("[data-size]").forEach(b=>b.addEventListener("click",()=>setOption("size",b.dataset.size)));
+document.querySelectorAll("[data-theme]").forEach(b=>b.addEventListener("click",()=>setOption("theme",b.dataset.theme)));
+document.querySelectorAll("[data-starter]").forEach(b=>b.addEventListener("click",()=>{
+  if (b.dataset.starter === "alternate") state.startMode="alternate";
+  else {state.startMode="fixed";state.starts=Number(b.dataset.starter);}
+  sendSave();render();
+}));
+for(let i=1;i<=2;i++) {
+  el("name"+i).addEventListener("change",()=>setProfileName(i,el("name"+i).value));
+  for (const color of Object.keys(COLORS)) {
+    const b=document.createElement("button");b.type="button";b.dataset.color=color;
+    b.style.background=COLORS[color];b.setAttribute("aria-label",COLOR_NAMES[color]);
+    b.addEventListener("click",()=>setProfileColor(i,color));el("colors"+i).appendChild(b);
+  }
+}
+for (let i=1;i<=2;i++) el("icon"+i).addEventListener("click",()=>{
+  pickerFor=i;el("picker").hidden=false;el("customIcon").value="";
+});
+function setIcon(icon) {
+  icon=String(icon).trim();
+  if (!icon || Array.from(icon).length>8) return alert("Použij jeden emoji nebo krátký symbol.");
+  if (icon === state.icons[2-pickerFor]) return alert("Oba hráči musí mít odlišné ikony.");
+  state.icons[pickerFor-1]=icon;el("picker").hidden=true;sendSave();render();
+}
+for (const icon of ICONS) {
+  const b=document.createElement("button");b.textContent=icon;b.type="button";
+  b.addEventListener("click",()=>setIcon(icon));el("emojis").appendChild(b);
+}
+el("setCustom").addEventListener("click",()=>setIcon(el("customIcon").value));
+el("resetScores").addEventListener("click",()=>{el("resetConfirm").hidden=false;});
+el("cancelReset").addEventListener("click",()=>{el("resetConfirm").hidden=true;});
+el("confirmReset").addEventListener("click",()=>{
+  state.scores={ai:[0,0,0],human:[0,0,0]};sendSave();render();
+  el("resetConfirm").hidden=true;
+  el("resetScores").textContent="✓ Výsledky vynulovány";
+  setTimeout(()=>{el("resetScores").textContent="Vynulovat výsledky";},1800);
+});
+// Po obnovení rozehrané hry může být právě na tahu AI.
+render();scheduleAI();
+</script>
+</body></html>

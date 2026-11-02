@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1930">
+  <meta name="description" content="Oddechové hry v Číselné aréně: Piškvorky Deluxe, Pong Fotbal a Breakout Deluxe.">
+  <link rel="icon" href="../assets/arena-icon.png" type="image/png">
+  <title>Oddechové hry – Číselná aréna</title>
+  <style>
+    *{box-sizing:border-box}
+    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f1f6ff;background:#08152b}
+    body{margin:0;min-height:100dvh;background:radial-gradient(ellipse at 50% 8%,#1c3a62 0%,transparent 57%),linear-gradient(150deg,#0b1b35,#061021);color:#eef4ff}
+    a{color:inherit;text-decoration:none}
+    a:focus-visible{outline:3px solid #ffd47a;outline-offset:4px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:15px clamp(18px,4vw,48px);border-bottom:1px solid #a7834b66;background:#08172cee}
+    .brand{display:inline-flex;align-items:center}
+    .brand img{display:block;width:min(220px,45vw);height:auto}
+    .back{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 16px;border:1px solid #43648a;border-radius:12px;color:#ffdc97;background:#173152;font-weight:750;font-size:14px}
+    .back:hover,.play:hover{filter:brightness(1.15)}
+    main{max-width:1190px;margin:auto;padding:clamp(22px,4vw,48px) clamp(16px,4vw,36px) 55px}
+    .intro{text-align:center;margin-bottom:28px}
+    .eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;color:#ffd38a}
+    h1{margin:8px 0 9px;color:#ffdfa6;font-size:clamp(30px,5vw,46px)}
+    .intro p{max-width:650px;margin:0 auto;color:#bdd0e7;line-height:1.6;font-size:15px}
+    .games{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:19px}
+    .game{display:flex;flex-direction:column;overflow:hidden;border:1px solid #3e638e;border-radius:19px;background:linear-gradient(150deg,#19375d,#0e2240);box-shadow:0 18px 36px #02091580}
+    .preview{display:block;width:100%;aspect-ratio:760/420;object-fit:cover;background:#0b1b35}
+    .info{display:flex;flex-direction:column;gap:11px;flex:1;padding:20px}
+    .info h2{margin:0;font-size:22px;color:#ffe3a5}
+    .info p{margin:0;flex:1;color:#ccdaec;font-size:14px;line-height:1.55}
+    .tag{align-self:flex-start;color:#8ed9f7;font-size:11px;font-weight:800;letter-spacing:.4px}
+    .play{display:inline-flex;align-items:center;justify-content:center;min-height:46px;border-radius:12px;background:linear-gradient(155deg,#fff0c2,#efc775);border:1px solid #ffedbb;color:#162540;font-weight:850}
+    .foot{text-align:center;margin:24px 0 0;color:#9eb9d4;font-size:12px;line-height:1.55}
+    @media(max-width:900px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){.games{grid-template-columns:minmax(0,1fr)}.info{padding:17px}.intro{margin-bottom:22px}header{gap:10px}.back{font-size:12px;padding:8px 11px}}
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="../index.html" aria-label="Číselná aréna – hlavní stránka"><img src="../assets/arena-logo.svg" alt="Číselná aréna"></a>
+    <a class="back" href="../index.html">← Zpět do arény</a>
+  </header>
+  <main>
+    <div class="intro">
+      <div class="eyebrow">ČÍSELNÁ ARÉNA</div>
+      <h1>🎮 Oddechové hry</h1>
+      <p>Tři malé hry pro chvíle odpočinku. Vyber si, na co máš chuť, a hraj na mobilu, tabletu nebo počítači.</p>
+    </div>
+    <section class="games" aria-label="Výběr oddechových her">
+      <article class="game">
+        <img class="preview" src="./piskvorky.svg" alt="Náhled hry Piškvorky Deluxe" width="760" height="420">
+        <div class="info">
+          <span class="tag">LOGICKÁ HRA · 1–2 HRÁČI</span>
+          <h2>Piškvorky Deluxe</h2>
+          <p>Zahraj si proti počítači nebo ve dvou. Vlastní symboly, motivy, obtížnosti a výsledky.</p>
+          <a class="play" href="./piskvorky.html" aria-label="Hrát Piškvorky Deluxe">Hrát Piškvorky →</a>
+        </div>
+      </article>
+      <article class="game">
+        <img class="preview" src="./pong-fotbal.svg" alt="Náhled hry Pong Fotbal" width="760" height="420">
+        <div class="info">
+          <span class="tag">ARKÁDA · 1–2 HRÁČI</span>
+          <h2>Pong Fotbal</h2>
+          <p>Fotbalový souboj s míčkem. Tři obtížnosti, různá hřiště a zápasy na góly.</p>
+          <a class="play" href="./pong-fotbal.html" aria-label="Hrát Pong Fotbal">Hrát Pong Fotbal →</a>
+        </div>
+      </article>
+      <article class="game">
+        <img class="preview" src="./breakout.svg" alt="Náhled hry Breakout Deluxe" width="760" height="420">
+        <div class="info">
+          <span class="tag">ARKÁDA · 1 HRÁČ</span>
+          <h2>Breakout Deluxe</h2>
+          <p>Rozbíjej barevné kostky, postupuj úrovněmi a zkus překonat svůj rekord.</p>
+          <a class="play" href="./breakout.html" aria-label="Hrát Breakout Deluxe">Hrát Breakout →</a>
+        </div>
+      </article>
+    </section>
+    <p class="foot">Hry jsou zdarma a bez přihlášení. Nastavení a rekordy se ukládají pouze v tomto prohlížeči.</p>
+  </main>
+</body>
+</html>

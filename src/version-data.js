@@ -1,7 +1,12 @@
 // Single source of visible application version and release notes.
 // Keep package.json in sync; tests verify they match.
-export const APP_VERSION = '0.2.68';
+export const APP_VERSION = '0.2.69';
 export const RELEASE_HISTORY = Object.freeze([
+  {
+    version: '0.2.69',
+    date: '2. 11. 2026',
+    description: 'V horní nabídce přibyly Oddechové hry: Piškvorky Deluxe, Pong Fotbal a Breakout Deluxe. Webové verze zachovávají vzhled a pravidla ze Scriptable a fungují na mobilu, tabletu i počítači.'
+  },
   {
     version: '0.2.68',
     date: '30. 10. 2026',

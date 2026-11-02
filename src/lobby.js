@@ -1,5 +1,5 @@
-import {initOnline,getOnlineProfile,updateOnlineProfile} from './online-client.js?v=0.2.68';
-import {syncResumeCard} from './resume-card.js?v=0.2.68';
+import {initOnline,getOnlineProfile,updateOnlineProfile} from './online-client.js?v=0.2.69';
+import {syncResumeCard} from './resume-card.js?v=0.2.69';
 const PROFILE_KEY = 'arena-local-profile-v1';
 const GAME_KEY = 'retro-arena-game-v1';
 const byId = id => document.getElementById(id);

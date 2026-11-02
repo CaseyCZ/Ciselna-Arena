@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="cs"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Pong Fotbal</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#07131c;--panel:#122632;--line:#305266;--text:#f6faff;--muted:#9bbcc9}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:2px solid #f5db7d;outline-offset:2px}
+.app{height:100%;height:100dvh;max-width:630px;margin:auto;padding:max(9px,env(safe-area-inset-top)) 13px max(9px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:45px}
+.brand{display:flex;align-items:center;gap:10px}.appicon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#098a72,#0e6fa8);font-size:22px;box-shadow:0 5px 20px #0e9f8955}
+h1{margin:0;font-size:20px;letter-spacing:-.6px;line-height:1}.sub{font-size:10px;color:var(--muted);letter-spacing:1.3px;font-weight:800;margin-top:5px}
+.iconbtn{width:43px;height:43px;background:#183544;border:1px solid #376073;border-radius:13px;font-size:22px}
+.scoreboard{border:1px solid var(--line);border-radius:15px;padding:10px 12px;background:linear-gradient(145deg,#143245,#10232f);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px}
+.team{text-align:center}.teamname{display:block;font-size:11px;color:#b7cfdb;font-weight:800;letter-spacing:.7px}.score{display:block;font-size:31px;line-height:1.1;font-weight:900;font-variant-numeric:tabular-nums}.leftscore{color:#69d5ff}.rightscore{color:#ff997c}.dash{color:#557989;font-weight:900;font-size:24px}.minor{font-size:11px;color:var(--muted);text-align:center;min-height:15px}
+.gamearea{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.pitch{height:100%;max-height:660px;max-width:100%;aspect-ratio:360/530;position:relative;overflow:hidden;border:2px solid #396957;border-radius:19px;background:#12613d;box-shadow:0 8px 32px #0008}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.overlay{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;background:#06151abb;padding:20px;backdrop-filter:blur(4px)}.overlay[hidden]{display:none}
+.card{width:min(290px,100%);border:1px solid #5f938b;background:#123345f2;padding:22px 18px;border-radius:19px;text-align:center;box-shadow:0 20px 50px #0008}
+.card .big{font-size:38px;margin-bottom:9px}.card h2{margin:0 0 8px;font-size:21px}.card p{color:#c6dce4;font-size:13px;line-height:1.5;margin:0 0 17px}
+.primary{width:100%;border:0;border-radius:12px;padding:12px;background:linear-gradient(120deg,#148e83,#1277c0);font-weight:850;font-size:15px;box-shadow:0 6px 20px #098e7d55}
+.secondary{border-radius:11px;border:1px solid #41667b;background:#173544;padding:11px 15px;font-weight:800;min-width:122px}
+.buttons{display:flex;gap:9px}.buttons .primary{flex:1}
+.hint{margin:0;font-size:11px;color:#8caab6;text-align:center;min-height:14px}
+.modalback{position:fixed;z-index:5;inset:0;background:#030c11cb;display:flex;align-items:center;justify-content:center;padding:15px;backdrop-filter:blur(7px)}.modalback[hidden]{display:none}
+.settings{border:1px solid #426b7d;background:#142d3c;padding:20px;border-radius:22px;max-height:92dvh;overflow-y:auto;width:min(390px,100%);box-shadow:0 20px 60px #0008}
+.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.modalhead h2{margin:0;font-size:21px}.smallx{background:#264556;border:0;border-radius:10px;padding:7px 11px;font-size:17px}
+.settinglabel{display:block;font-weight:800;font-size:12px;color:#b6d0da;margin:14px 0 7px}.options{display:flex;gap:6px}.choice{flex:1;min-width:0;min-height:42px;border:1px solid #416879;background:#1c3a4a;border-radius:10px;font-size:12px;font-weight:750;padding:7px 4px}
+.choice.active{background:#185f72;border-color:#6fe5cf;box-shadow:inset 0 0 0 1px #6fe5cf66}
+.settingrow{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:16px}.toggle{border:1px solid #507584;background:#2b4a57;padding:8px 12px;border-radius:10px;font-weight:800;min-width:70px}.toggle.on{color:#a0ffdb;border-color:#4b9c82;background:#205b52}
+.statline{margin-top:15px;padding-top:14px;border-top:1px solid #36576a;display:flex;justify-content:space-between;font-size:13px;color:#bcd3df}.danger{width:100%;margin-top:13px;border:1px solid #a5686b;background:#51333d;color:#ffd1d8;padding:11px;border-radius:11px;font-weight:800}
+.version{text-align:center;font-size:11px;color:#90acbb;margin:14px 0 0}.updatestatus{margin:11px 0;color:#9ce0c9;font-size:11px;line-height:1.45;text-align:center}.updatecheck{width:100%;margin-top:9px}
+@media(max-height:680px){.app{gap:6px}.scoreboard{padding:5px}.score{font-size:23px}.hint{display:none}}
+
+    .arena-top-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
+    .arena-back{width:42px;height:42px;border:1px solid #ffffff35;border-radius:12px;
+      background:#ffffff12;color:#fff;display:grid;place-items:center;text-decoration:none;
+      font:700 23px/1 system-ui,sans-serif;flex-shrink:0}
+    .arena-back:hover,.arena-back:focus-visible{background:#ffffff28;border-color:#ffffff88}
+    @media(max-width:370px){.arena-top-actions{gap:5px}.arena-back{width:36px;height:42px}}
+  </style></head><body>
+<main class="app">
+  <header class="top"><div class="brand"><span class="appicon">⚽</span><div><h1>Pong Fotbal</h1><div class="sub">FOTBALOVÁ ARKÁDA</div></div></div><div class="arena-top-actions"><a class="arena-back" href="./" aria-label="Zpět na oddechové hry" title="Zpět na oddechové hry">←</a><button id="settingsBtn" class="iconbtn" aria-label="Nastavení">⚙️</button></div></header>
+  <section class="scoreboard"><div class="team"><span class="teamname">🔵 MODŘÍ</span><span id="scoreL" class="score leftscore">0</span></div><div class="dash">:</div><div class="team"><span id="rightName" class="teamname">🔴 POČÍTAČ</span><span id="scoreR" class="score rightscore">0</span></div></section>
+  <div class="minor" id="matchInfo">Hraje se do 5 gólů</div>
+  <div class="gamearea"><div class="pitch"><canvas id="field" width="360" height="530" aria-label="Fotbalový Pong"></canvas>
+    <div id="overlay" class="overlay"><div class="card"><div id="overlayIcon" class="big">⚽</div><h2 id="overlayTitle">Připraven?</h2><p id="overlayText">Modří jsou dole, červení nahoře. Pálku posouváš vodorovně.</p><button id="overlayButton" class="primary">Výkop!</button></div></div>
+  </div></div>
+  <div class="buttons"><button id="pauseBtn" class="secondary">⏸ Pauza</button><button id="newBtn" class="primary">↻ Nový zápas</button></div>
+  <p id="hint" class="hint">👆 Tažením po spodní části hřiště ovládáš modré</p>
+</main>
+<div id="settingsModal" class="modalback" hidden><section class="settings" role="dialog" aria-label="Nastavení" aria-modal="true">
+  <div class="modalhead"><h2>⚙️ Nastavení</h2><button class="smallx" id="closeSettings" aria-label="Zavřít">✕</button></div>
+  <span class="settinglabel">Herní režim</span><div class="options">
+    <button class="choice" data-mode="ai">🤖 1 hráč</button><button class="choice" data-mode="human">👥 2 hráči</button>
+  </div>
+  <span class="settinglabel">Obtížnost počítače</span><div class="options">
+    <button class="choice" data-difficulty="easy">🙂 Lehká</button><button class="choice" data-difficulty="normal">🎮 Normální</button><button class="choice" data-difficulty="hard">🔥 Těžká</button>
+  </div>
+  <span class="settinglabel">Délka zápasu</span><div class="options">
+    <button class="choice" data-target="3">3 góly</button><button class="choice" data-target="5">5 gólů</button><button class="choice" data-target="10">10 gólů</button>
+  </div>
+  <span class="settinglabel">Vzhled hřiště</span><div class="options">
+    <button class="choice" data-theme="stadium">🌿 Trávník</button><button class="choice" data-theme="night">🌙 Noc</button><button class="choice" data-theme="classic">⚪ Klasika</button>
+  </div>
+  <div class="settingrow"><span class="settinglabel">Zvuky</span><button class="toggle" id="soundBtn">Zapnuto</button></div>
+  <div class="statline"><span>Vítězství 🔵 / 🔴</span><b id="winStats">0 / 0</b></div>
+  <button class="danger" id="resetStats">Vynulovat výsledky</button>
+  <p class="version">⚽ Pong Fotbal · verze 1.1.0</p><p class="updatestatus" id="updateStatus">Kontrola verze probíhá při spuštění.</p>
+</section></div>
+<script>
+"use strict";
+const saveKey="pong_fotbal_v1", previous=(()=>{try{return JSON.parse(localStorage.getItem("pong_fotbal_v1")||"{}")||{}}catch{return {}}})();
+const config={mode:previous.mode==="human"?"human":"ai",difficulty:["easy","normal","hard"].includes(previous.difficulty)?previous.difficulty:"normal",target:[3,5,10].includes(Number(previous.target))?Number(previous.target):5,theme:["stadium","night","classic"].includes(previous.theme)?previous.theme:"stadium",sound:previous.sound!==false,wins:Array.isArray(previous.wins)&&previous.wins.length===2?previous.wins.map(x=>Math.max(0,Number(x)||0)):[0,0],games:Math.max(0,Number(previous.games)||0)};
+const state=config;
+const el=id=>document.getElementById(id),cv=el("field"),g=cv.getContext("2d"),W=530,H=360;
+const palettes={
+ stadium:{grass:["#126b42","#0b5837"],lines:"#c6ffdb91",left:"#48cfff",right:"#ff8576",ball:"#fff"},
+ night:{grass:["#0b2940","#10253c"],lines:"#7bb4ce80",left:"#6ccfff",right:"#ff8aab",ball:"#fff"},
+ classic:{grass:["#eeeeee","#e1e6e5"],lines:"#4b565b72",left:"#1d9da7",right:"#e24d4b",ball:"#fff"}
+};
+const AI={easy:{speed:155,delay:.3,error:32},normal:{speed:247,delay:.14,error:15},hard:{speed:355,delay:.055,error:5}};
+const PAD_H=85,PAD_W=12,PAD_OFFSET=19,R=8;
+let left={y:H/2},right={y:H/2},ball={x:W/2,y:H/2,vx:0,vy:0},scoreL=0,scoreR=0;
+let phase="ready",serveToward=1,lastFrame=0,particles=[],trail=[],audio=null,aiTime=0,aiAim=H/2;
+let confirmReset=false,controls=new Map(),keyUp=false,keyDown=false,keyW=false,keyS=false;
+function clamp(a,lo,hi){return Math.max(lo,Math.min(hi,a))}
+function save(){try{localStorage.setItem(saveKey,JSON.stringify(config))}catch(_){}}
+try{const p=JSON.parse(localStorage.getItem(saveKey)||"null");if(p&&Array.isArray(p.wins)) config.wins=config.wins.map((w,i)=>Math.max(w,Number(p.wins[i])||0))}catch(_){}
+function chirp(f,d=85,type="sine",gain=.036){if(!config.sound)return;try{if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume().catch(()=>{});const a=audio.createOscillator(),v=audio.createGain(),t=audio.currentTime;a.frequency.value=f;a.type=type;v.gain.setValueAtTime(gain,t);v.gain.exponentialRampToValueAtTime(.001,t+d/1000);a.connect(v);v.connect(audio.destination);a.start();a.stop(t+d/1000)}catch(_){}}
+function confetti(x,y,color,count=20){for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,sp=40+Math.random()*150;particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:.5+Math.random()*.7,color,size:2+Math.random()*3})}if(particles.length>260)particles.splice(0,particles.length-260)}
+function updateHUD(){el("scoreL").textContent=scoreL;el("scoreR").textContent=scoreR;el("rightName").textContent=config.mode==="ai"?"🔴 POČÍTAČ":"🔴 HRÁČ 2";el("matchInfo").textContent="Hraje se do "+config.target+" gólů";el("hint").textContent=config.mode==="ai"?"👆 Tažením po levé části hřiště ovládáš modré":"👥 Modří dole, červení nahoře – každý svou polovinu";el("pauseBtn").textContent=phase==="playing"?"⏸ Pauza":"▶ Pokračovat";el("winStats").textContent=config.wins[0]+" / "+config.wins[1]}
+function show(icon,title,message,btn){el("overlayIcon").textContent=icon;el("overlayTitle").textContent=title;el("overlayText").textContent=message;el("overlayButton").textContent=btn;el("overlay").hidden=false}
+function hide(){el("overlay").hidden=true}
+function phaseTo(p){phase=p;updateHUD()}
+function park(){ball.x=W/2;ball.y=H/2;ball.vx=0;ball.vy=0;trail=[]}
+function match(){scoreL=0;scoreR=0;left.y=H/2;right.y=H/2;particles=[];controls.clear();serveToward=Math.random()<.5?-1:1;park();phaseTo("ready");show("⚽","Připraveni?",config.mode==="ai"?"Hraješ dole za modré, počítač je nahoře. První na "+config.target+" gólů vyhrává.":"Modří jsou dole, červení nahoře. Pálky posouváte vodorovně. První na "+config.target+" gólů vyhrává.","Výkop!");config.games++;save()}
+function kick(){if(phase!=="ready")return;const speed=295,spread=(Math.random()-.5)*.8;ball.vx=serveToward*speed*Math.cos(spread);ball.vy=speed*Math.sin(spread);if(Math.abs(ball.vy)<45)ball.vy=45*(Math.random()<.5?-1:1);hide();phaseTo("playing");chirp(620,100)}
+function togglePause(){if(phase==="playing"){phaseTo("paused");show("⏸","Pauza","Zápas je pozastavený.","Pokračovat")}else if(phase==="paused"){phaseTo("playing");hide();lastFrame=performance.now()}else if(phase==="ready")kick()}
+function mainButton(){if(phase==="ready")kick();else if(phase==="paused")togglePause();else if(phase==="finished")match()}
+function goal(scorer){if(phase!=="playing")return;if(scorer===0)scoreL++;else scoreR++;serveToward=scorer===0?1:-1;chirp(scorer===0?780:320,230,"triangle",.055);confetti(scorer===0?W-15:15,H/2,scorer===0?"#4ad6ff":"#ff9a7a",36);park();if(scoreL>=config.target||scoreR>=config.target){phaseTo("finished");config.wins[scoreL>scoreR?0:1]++;save();show("🏆",scoreL>scoreR?"Vyhráli modří!":"Vyhráli červení!","Konečný výsledek "+scoreL+" : "+scoreR+". Zahraješ si odvetu?","Odveta")}else{phaseTo("ready");show("⚽",scorer===0?"Gól modrých!":"Gól červených!","Stav zápasu: "+scoreL+" : "+scoreR,"Další výkop")}}
+function aiStep(dt){if(config.mode!=="ai"||phase!=="playing")return;const p=AI[config.difficulty];aiTime-=dt;if(aiTime<=0){aiTime=p.delay;let aimed=ball.vx>0?ball.y+ball.vy*(W-ball.x)/Math.max(ball.vx,1):H/2;let period=H*2;aimed=((aimed%period)+period)%period;if(aimed>H)aimed=period-aimed;aiAim=clamp(aimed+(Math.random()-.5)*p.error*2,PAD_H/2,H-PAD_H/2)}const dir=Math.sign(aiAim-right.y),step=p.speed*dt;right.y=clamp(right.y+dir*Math.min(step,Math.abs(aiAim-right.y)),PAD_H/2+8,H-PAD_H/2-8)}
+function physics(dt){if(phase!=="playing")return;aiStep(dt);if(keyW)left.y-=290*dt;if(keyS)left.y+=290*dt;if(config.mode==="human"){if(keyUp)right.y-=290*dt;if(keyDown)right.y+=290*dt}left.y=clamp(left.y,PAD_H/2+7,H-PAD_H/2-7);right.y=clamp(right.y,PAD_H/2+7,H-PAD_H/2-7);
+ const oldX=ball.x,oldY=ball.y;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;
+ if(ball.y-R<9){ball.y=9+R;ball.vy=Math.abs(ball.vy);chirp(245,35)}if(ball.y+R>H-9){ball.y=H-9-R;ball.vy=-Math.abs(ball.vy);chirp(245,35)}
+ const bxL=PAD_OFFSET+PAD_W,bxR=W-PAD_OFFSET-PAD_W;
+ if(ball.vx<0&&oldX-R>=bxL-3&&ball.x-R<=bxL&&Math.abs(ball.y-left.y)<=PAD_H/2+R){bounce(1,left.y,bxL+R)}
+ if(ball.vx>0&&oldX+R<=bxR+3&&ball.x+R>=bxR&&Math.abs(ball.y-right.y)<=PAD_H/2+R){bounce(-1,right.y,bxR-R)}
+ if(ball.x+R<0)goal(1);if(ball.x-R>W)goal(0);
+}
+function bounce(dir,mid,correctX){const power=clamp((ball.y-mid)/(PAD_H/2),-1,1),speed=clamp(Math.hypot(ball.vx,ball.vy)*1.05,245,535);ball.x=correctX;ball.vx=dir*Math.max(speed*.50,Math.cos(power*.95)*speed);ball.vy=Math.sin(power*.95)*speed;if(Math.abs(ball.vy)<30)ball.vy=30*(Math.random()<.5?-1:1);chirp(dir===1?420:520,75,"triangle")}
+function roundRect(x,y,w,h,r,color){g.fillStyle=color;g.beginPath();g.roundRect(x,y,w,h,r);g.fill()}
+function render(t){g.setTransform(0,-1,1,0,0,W);const p=palettes[config.theme];g.fillStyle=p.grass[0];g.fillRect(0,0,W,H);for(let i=0;i<10;i++){g.fillStyle=p.grass[i%2];g.fillRect(i*W/10,0,W/10,H)}
+ g.strokeStyle=p.lines;g.lineWidth=2.2;g.strokeRect(9,8,W-18,H-16);g.beginPath();g.moveTo(W/2,9);g.lineTo(W/2,H-9);g.stroke();g.beginPath();g.arc(W/2,H/2,52,0,Math.PI*2);g.stroke();
+ g.strokeRect(9,H/2-92,44,184);g.strokeRect(W-53,H/2-92,44,184);g.strokeRect(9,H/2-45,15,90);g.strokeRect(W-24,H/2-45,15,90);
+ g.beginPath();g.arc(W/2,H/2,3.3,0,Math.PI*2);g.fillStyle=p.lines;g.fill();
+ for(const dot of trail){g.globalAlpha=dot.life*.35;g.fillStyle="#e6f8ff";g.beginPath();g.arc(dot.x,dot.y,R*dot.life,0,Math.PI*2);g.fill()}g.globalAlpha=1;
+ for(const q of particles){g.globalAlpha=clamp(q.life,0,1);g.fillStyle=q.color;g.beginPath();g.arc(q.x,q.y,q.size,0,Math.PI*2);g.fill()}g.globalAlpha=1;
+ g.shadowBlur=13;g.shadowColor=p.left;roundRect(PAD_OFFSET,left.y-PAD_H/2,PAD_W,PAD_H,5,p.left);g.shadowColor=p.right;roundRect(W-PAD_OFFSET-PAD_W,right.y-PAD_H/2,PAD_W,PAD_H,5,p.right);g.shadowBlur=0;
+ g.shadowColor="#0009";g.shadowBlur=7;g.fillStyle="#fff";g.beginPath();g.arc(ball.x,ball.y,R,0,Math.PI*2);g.fill();g.shadowBlur=0;g.fillStyle="#172a35";g.beginPath();g.arc(ball.x,ball.y,R*.35,0,Math.PI*2);g.fill();for(let i=0;i<5;i++){const a=i*Math.PI*2/5;g.beginPath();g.arc(ball.x+Math.cos(a)*R*.7,ball.y+Math.sin(a)*R*.7,1.15,0,Math.PI*2);g.fill()}
+}
+function frame(ts){let dt=lastFrame?Math.min((ts-lastFrame)/1000,.035):0;lastFrame=ts;if(phase==="playing"){const count=Math.max(1,Math.ceil(dt/.005));for(let i=0;i<count;i++)physics(dt/count);trail.unshift({x:ball.x,y:ball.y,life:1});if(trail.length>9)trail.pop()}for(const q of particles){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=100*dt;q.life-=dt*1.5}particles=particles.filter(x=>x.life>0);for(const dot of trail)dot.life-=dt*3;trail=trail.filter(x=>x.life>0);render(ts);requestAnimationFrame(frame)}
+function touchY(t){const r=cv.getBoundingClientRect();return clamp((t.clientX-r.left)/r.width*H,PAD_H/2+7,H-PAD_H/2-7)}
+function touchSide(t){const r=cv.getBoundingClientRect();return (t.clientY-r.top)>r.height/2?0:1}
+function updateTouch(t,side){if(side===0)left.y=touchY(t);else if(config.mode==="human")right.y=touchY(t)}
+cv.addEventListener("touchstart",e=>{e.preventDefault();for(const t of e.changedTouches){const side=touchSide(t);if(config.mode==="ai"&&side===1)continue;controls.set(t.identifier,side);updateTouch(t,side)}if(phase==="ready"&&el("overlay").hidden)kick()},{passive:false});
+cv.addEventListener("touchmove",e=>{e.preventDefault();for(const t of e.changedTouches){if(controls.has(t.identifier))updateTouch(t,controls.get(t.identifier))}},{passive:false});
+const endTouches=e=>{for(const t of e.changedTouches)controls.delete(t.identifier)};
+cv.addEventListener("touchend",endTouches);cv.addEventListener("touchcancel",endTouches);
+// Myš a stylus pro iPad / počítač; na dotykovém iPhonu se používá touch výše.
+cv.addEventListener("pointermove",e=>{if(e.pointerType==="touch")return;const r=cv.getBoundingClientRect(),side=e.clientY-r.top>r.height/2?0:1;updateTouch(e,side)});
+document.addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(k==="a")keyW=true;if(k==="d")keyS=true;if(k==="arrowleft")keyUp=true;if(k==="arrowright")keyDown=true;if(k===" "||k==="enter"){e.preventDefault();mainButton()}if(k==="p"||k==="escape"){e.preventDefault();togglePause()}});
+document.addEventListener("keyup",e=>{const k=e.key.toLowerCase();if(k==="a")keyW=false;if(k==="d")keyS=false;if(k==="arrowleft")keyUp=false;if(k==="arrowright")keyDown=false});
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&phase==="playing")togglePause()});
+el("pauseBtn").addEventListener("click",togglePause);el("newBtn").addEventListener("click",match);el("overlayButton").addEventListener("click",mainButton);
+function settingsUI(){for(const b of document.querySelectorAll("[data-mode]"))b.classList.toggle("active",b.dataset.mode===config.mode);for(const b of document.querySelectorAll("[data-difficulty]"))b.classList.toggle("active",b.dataset.difficulty===config.difficulty);for(const b of document.querySelectorAll("[data-target]"))b.classList.toggle("active",Number(b.dataset.target)===config.target);for(const b of document.querySelectorAll("[data-theme]"))b.classList.toggle("active",b.dataset.theme===config.theme);el("soundBtn").classList.toggle("on",config.sound);el("soundBtn").textContent=config.sound?"Zapnuto":"Vypnuto";updateHUD()}
+function openSettings(){if(phase==="playing")togglePause();el("settingsModal").hidden=false;settingsUI()}
+function closeSettings(){el("settingsModal").hidden=true;confirmReset=false;el("resetStats").textContent="Vynulovat výsledky";save()}
+el("settingsBtn").addEventListener("click",openSettings);el("closeSettings").addEventListener("click",closeSettings);
+for(const b of document.querySelectorAll("[data-mode]"))b.addEventListener("click",()=>{if(config.mode===b.dataset.mode)return;config.mode=b.dataset.mode;closeSettings();match();save()});
+for(const b of document.querySelectorAll("[data-difficulty]"))b.addEventListener("click",()=>{config.difficulty=b.dataset.difficulty;settingsUI();save()});
+for(const b of document.querySelectorAll("[data-target]"))b.addEventListener("click",()=>{config.target=Number(b.dataset.target);closeSettings();match();save()});
+for(const b of document.querySelectorAll("[data-theme]"))b.addEventListener("click",()=>{config.theme=b.dataset.theme;settingsUI();save()});
+el("soundBtn").addEventListener("click",()=>{config.sound=!config.sound;settingsUI();save();chirp(670,90)});
+el("resetStats").addEventListener("click",()=>{if(!confirmReset){confirmReset=true;el("resetStats").textContent="Opravdu vynulovat? Klepni znovu";return}config.wins=[0,0];confirmReset=false;save();settingsUI();el("resetStats").textContent="✓ Výsledky vynulovány"});
+updateHUD();settingsUI();show("⚽","Připraveni?",config.mode==="ai"?"Hraješ dole za modré, počítač je nahoře. K vítězství potřebuješ "+config.target+" gólů.":"Hráč 1 je dole, hráč 2 nahoře. Pálky posouvejte vodorovně. První na "+config.target+" gólů vyhrává.","Výkop!");requestAnimationFrame(frame);
+
+document.getElementById("updateStatus").textContent="Webová verze se aktualizuje automaticky.";
+
+
+</script></body></html>

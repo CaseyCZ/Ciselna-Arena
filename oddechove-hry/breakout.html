@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="color-scheme" content="dark">
+  <title>Breakout Deluxe</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --accent: #5696ff; --accent2: #9366fa;
+      --bg: #070d1c; --panel: #111d32; --border: #283a58;
+      --ink: #f5f7ff; --muted: #9eb0cd;
+    }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden;
+      background: var(--bg); color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif; }
+    button { font: inherit; cursor: pointer; color: inherit; }
+    button:focus-visible { outline: 2px solid #a5d4ff; outline-offset: 3px; }
+    .app { height: 100%; height: 100dvh; display: flex; flex-direction: column;
+      padding: max(10px, env(safe-area-inset-top)) 14px max(10px, env(safe-area-inset-bottom));
+      gap: 10px; max-width: 620px; margin: 0 auto; }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 43px; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .appicon { width: 39px; height: 39px; border-radius: 12px; display: grid; place-items: center;
+      background: linear-gradient(145deg,#295eec,#8d4bea); font-size: 21px;
+      box-shadow: 0 4px 18px #3563da40; }
+    h1 { font-size: 20px; line-height: 1.1; letter-spacing: -.5px; margin: 0; }
+    .subtitle { color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: 1.35px; margin-top: 4px; }
+    .iconbtn { background: #17243b; border: 1px solid #334363; min-width: 42px; height: 42px;
+      border-radius: 13px; display: grid; place-items: center; font-size: 21px; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .stat { padding: 9px 5px; background: linear-gradient(160deg,#152239,#101a2c);
+      border: 1px solid #263856; border-radius: 13px; text-align: center; }
+    .statlabel { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px;
+      color: #92a5c6; font-weight: 800; margin-bottom: 3px; }
+    .statvalue { display: block; font-size: 21px; font-weight: 800; line-height: 1.1;
+      font-variant-numeric: tabular-nums; }
+    .life { color: #ff688d; font-size: 17px; letter-spacing: 2px; white-space: nowrap; }
+    .gamearea { flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; }
+    .board { position: relative; height: 100%; max-height: 660px; max-width: 100%;
+      aspect-ratio: 360 / 520; border: 1px solid #344361; border-radius: 20px; overflow: hidden;
+      background: #0a1020; box-shadow: 0 8px 36px #0007, inset 0 0 42px #152847; }
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+    .overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      padding: 20px; background: #060e20aa; backdrop-filter: blur(3px); }
+    .overlay[hidden] { display: none; }
+    .panel { width: min(285px,100%); padding: 22px 18px; text-align: center; border-radius: 21px;
+      border: 1px solid #456188; background: #111f37f5; box-shadow: 0 15px 55px #0007; }
+    .panel .symbol { font-size: 38px; margin-bottom: 8px; }
+    .panel h2 { margin: 0 0 8px; font-size: 22px; letter-spacing: -.5px; }
+    .panel p { color: #bacbe5; font-size: 13px; line-height: 1.5; margin: 0 0 18px; }
+    .primary { border: 0; border-radius: 12px; padding: 12px 20px; width: 100%;
+      background: linear-gradient(135deg,#3679ed,#7f55dd); font-weight: 800; font-size: 15px;
+      box-shadow: 0 6px 22px #356cf046; }
+    .secondary { border: 1px solid #3c5076; border-radius: 11px; padding: 11px 17px;
+      background: #17263f; font-weight: 700; }
+    .actions { display: flex; align-items: center; gap: 9px; }
+    .actions .secondary { min-width: 120px; }
+    .actions .primary { flex: 1; }
+    .hint { margin: 0; min-height: 16px; text-align: center; color: #8fa5c9; font-size: 11px; }
+    .modalback { position: fixed; inset: 0; z-index: 5; background: #020814bd;
+      display: flex; align-items: center; justify-content: center; padding: 18px;
+      backdrop-filter: blur(8px); }
+    .modalback[hidden] { display: none; }
+    .settings { width: min(390px,100%); max-height: min(90dvh,690px); overflow-y: auto;
+      background: #122038; border: 1px solid #3e5274; border-radius: 22px; padding: 20px;
+      box-shadow: 0 20px 65px #0009; }
+    .modalhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .modalhead h2 { margin: 0; font-size: 21px; }
+    .smallx { padding: 7px 11px; border-radius: 10px; background: #253651; border: 0; font-size: 17px; }
+    .settinglabel { display: block; font-size: 12px; font-weight: 800; letter-spacing: .2px;
+      color: #b7cae7; margin: 15px 0 8px; }
+    .options { display: flex; gap: 7px; }
+    .choice { flex: 1; border: 1px solid #365074; background: #1c2b47; border-radius: 10px;
+      min-height: 42px; padding: 7px 5px; font-size: 12px; font-weight: 750; }
+    .choice.active { border-color: #77a2ff; background: #2b4777; color: #fff;
+      box-shadow: inset 0 0 0 1px #77a2ff65; }
+    .settingrow { display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0 3px; gap: 15px; }
+    .toggle { padding: 8px 13px; min-width: 68px; background: #293a57;
+      border: 1px solid #4b6080; border-radius: 10px; font-weight: 800; }
+    .toggle.on { background: #194e4b; border-color: #348a7a; color: #95ffdb; }
+    .record { display: flex; justify-content: space-between; padding: 14px 0; margin-top: 15px;
+      border-top: 1px solid #304464; border-bottom: 1px solid #304464; color: #d2e0f4; }
+    .record b { color: #fff; }
+    .danger { margin-top: 14px; width: 100%; background: #3b2235;
+      border: 1px solid #8c4d65; border-radius: 11px; padding: 11px; color: #ffb7c9; font-weight: 750; }
+    .version { text-align: center; color: #8298bd; font-size: 12px; margin: 15px 0 0; } .updatecheck { width:100%; margin-top:10px; } .updatestatus { color:#94d9cc; font-size:11px; line-height:1.45; text-align:center; margin-top:10px; }
+    @media (max-height: 650px) { .app { gap: 6px; } .stat { padding: 5px; }
+      .statvalue { font-size: 17px; } h1 { font-size: 17px; } .hint { display: none; } }
+  
+    .arena-top-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
+    .arena-back{width:42px;height:42px;border:1px solid #ffffff35;border-radius:12px;
+      background:#ffffff12;color:#fff;display:grid;place-items:center;text-decoration:none;
+      font:700 23px/1 system-ui,sans-serif;flex-shrink:0}
+    .arena-back:hover,.arena-back:focus-visible{background:#ffffff28;border-color:#ffffff88}
+    @media(max-width:370px){.arena-top-actions{gap:5px}.arena-back{width:36px;height:42px}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <div class="brand"><span class="appicon">🧱</span><div><h1>Breakout Deluxe</h1>
+        <div class="subtitle">ODDECHOVÁ HRA</div></div></div>
+      <div class="arena-top-actions"><a class="arena-back" href="./" aria-label="Zpět na oddechové hry" title="Zpět na oddechové hry">←</a><button class="iconbtn" id="settingsBtn" aria-label="Nastavení">⚙️</button></div>
+    </header>
+    <section class="stats" aria-label="Výsledky">
+      <div class="stat"><span class="statlabel">Skóre</span><span class="statvalue" id="score">0</span></div>
+      <div class="stat"><span class="statlabel">Úroveň</span><span class="statvalue" id="level">1</span></div>
+      <div class="stat"><span class="statlabel">Životy</span><span class="statvalue life" id="lives">♥ ♥ ♥</span></div>
+    </section>
+    <div class="gamearea"><div class="board">
+      <canvas id="game" width="360" height="520" aria-label="Herní plocha Breakout"></canvas>
+      <div class="overlay" id="overlay"><div class="panel">
+        <div class="symbol" id="overlayIcon">🚀</div>
+        <h2 id="overlayTitle">Připraven?</h2>
+        <p id="overlayText">Pohybuj prstem doleva a doprava, abys ovládal pálku. Rozbij všechny kostky!</p>
+        <button class="primary" id="overlayBtn">Hrát</button>
+      </div></div>
+    </div></div>
+    <div class="actions">
+      <button class="secondary" id="pauseBtn">⏸ Pauza</button>
+      <button class="primary" id="newBtn">↻ Nová hra</button>
+    </div>
+    <p class="hint">👆 Táhni prstem po ploše · klepni pro odpal</p>
+  </main>
+  <div class="modalback" id="settingsModal" hidden>
+    <section class="settings" role="dialog" aria-modal="true" aria-label="Nastavení hry">
+      <div class="modalhead"><h2>⚙️ Nastavení</h2><button id="settingsClose" class="smallx" aria-label="Zavřít">✕</button></div>
+      <span class="settinglabel">Obtížnost</span>
+      <div class="options" id="difficulties">
+        <button class="choice" data-difficulty="easy">🙂 Lehká</button>
+        <button class="choice" data-difficulty="normal">🎮 Normální</button>
+        <button class="choice" data-difficulty="hard">🔥 Těžká</button>
+      </div>
+      <span class="settinglabel">Vzhled hry</span>
+      <div class="options" id="themes">
+        <button class="choice" data-theme="space">🌌 Vesmír</button>
+        <button class="choice" data-theme="ocean">🌊 Oceán</button>
+        <button class="choice" data-theme="neon">🌈 Neon</button>
+      </div>
+      <div class="settingrow"><span class="settinglabel">Zvukové efekty</span><button id="soundBtn" class="toggle">Zapnuto</button></div>
+      <div class="record"><span>🏆 Nejlepší skóre</span><b id="best">0</b></div>
+      <button class="danger" id="resetBest">Vynulovat rekord</button>
+      <div class="version">🧱 Breakout Deluxe · verze 1.2.0</div><div class="updatestatus" id="updateStatus">Kontrola verze probíhá při spuštění.</div>
+    </section>
+  </div>
+  <script>
+  "use strict";
+  const STORAGE_KEY = "breakout_deluxe_v1";
+  const input = (()=>{try{return JSON.parse(localStorage.getItem("breakout_deluxe_v1")||"{}")||{}}catch{return {}}})();
+  const config = {
+    best: Math.max(0, Number(input.best) || 0),
+    sound: input.sound !== false,
+    difficulty: ["easy","normal","hard"].includes(input.difficulty) ? input.difficulty : "normal",
+    theme: ["space","ocean","neon"].includes(input.theme) ? input.theme : "space",
+    games: Math.max(0, Number(input.games) || 0),
+    levels: Math.max(0, Number(input.levels) || 0)
+  };
+  // Pro závěrečné uložení do Scriptable je záměrně globální.
+  const state = config;
+  const el = (id) => document.getElementById(id);
+  const cv = el("game"), ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height;
+  const palettes = {
+    space: { a: "#0a0f20", b: "#11203a", paddle: "#5498ff", stroke: "#bedfff", rows: ["#ff5966","#ff934e","#ffca51","#aaf063","#41dba1","#5bc3ff"] },
+    ocean: { a: "#071b26", b: "#0a3945", paddle: "#38dacc", stroke: "#a5fffc", rows: ["#ff8278","#ffc477","#f6e281","#91ecb5","#4cd6da","#74aef5"] },
+    neon: { a: "#16071f", b: "#291545", paddle: "#e273ff", stroke: "#fcd1ff", rows: ["#ff4d9f","#fb7160","#ffe05a","#78f65a","#29f3de","#9c72fc"] }
+  };
+  const diff = { easy: {speed: 208, paddle: 88}, normal: {speed: 265, paddle: 72}, hard: {speed: 327, paddle: 58} };
+  const PADDLE_Y = H - 37, PADDLE_H = 12, BALL_R = 6;
+  const COLS = 10, ROWS = 5, GAP = 4, LEFT = 14, BRICK_H = 19, BRICK_TOP = 48;
+  const BRICK_W = (W - LEFT * 2 - (COLS - 1) * GAP) / COLS;
+  let score = 0, level = 1, lives = 3, phase = "ready";
+  let paddle = {x: W / 2, w: diff[config.difficulty].paddle};
+  let ball = {x: W/2, y: PADDLE_Y-BALL_R, vx:0, vy:0, r:BALL_R};
+  let bricks = [], particles = [], trail = [], lastFrame = 0, audio = null;
+  let oldPhaseForModal = null, confirmReset = false;
+  const stars = Array.from({length:38},(_,i)=>({
+    x:(i*97.71+37)%W, y:(i*73.29+12)%H, r: .6+(i%4)*.35,
+    t:i*.7
+  }));
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(config)); } catch (_) {}
+  }
+  try {
+    const previous = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if (previous && typeof previous === "object") {
+      // Rekord zůstane zachován při opětovném otevření WebView v rámci instalace.
+      config.best = Math.max(config.best, Math.max(0, Number(previous.best)||0));
+    }
+  } catch (_) {}
+  function clamp(n,min,max) { return Math.min(max,Math.max(min,n)); }
+  function currentSpeed() { return diff[config.difficulty].speed + (level-1)*19; }
+  function playTone(hz, ms, type="sine", gain=.035) {
+    if (!config.sound) return;
+    try {
+      if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state === "suspended") audio.resume().catch(()=>{});
+      const osc=audio.createOscillator(), vol=audio.createGain(), t=audio.currentTime;
+      osc.type=type; osc.frequency.setValueAtTime(hz,t);
+      vol.gain.setValueAtTime(gain,t); vol.gain.exponentialRampToValueAtTime(.001,t+ms/1000);
+      osc.connect(vol);vol.connect(audio.destination);osc.start(t);osc.stop(t+ms/1000);
+    } catch (_) {}
+  }
+  function burst(x,y,color,count=9) {
+    for(let i=0;i<count;i++) {
+      const a=Math.random()*Math.PI*2, v=35+Math.random()*145;
+      particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.55+Math.random()*.45,color,r:1.5+Math.random()*2.5});
+    }
+    if(particles.length>230) particles.splice(0,particles.length-230);
+  }
+  function buildBricks() {
+    bricks=[];
+    for(let row=0;row<ROWS;row++) for(let col=0;col<COLS;col++)
+      bricks.push({x:LEFT+col*(BRICK_W+GAP),y:BRICK_TOP+row*(BRICK_H+GAP),w:BRICK_W,h:BRICK_H,row,alive:true});
+  }
+  function parkBall() {
+    ball.x=paddle.x;ball.y=PADDLE_Y-BALL_R-3;ball.vx=0;ball.vy=0;
+    trail=[];
+  }
+  function updateHUD() {
+    el("score").textContent=score.toLocaleString("cs-CZ");
+    el("level").textContent=level;
+    el("lives").textContent="♥ ".repeat(lives).trim() || "—";
+    el("best").textContent=config.best.toLocaleString("cs-CZ");
+    el("pauseBtn").textContent=phase==="playing"?"⏸ Pauza":"▶ Pokračovat";
+  }
+  function recordScore() { if(score>config.best) { config.best=score; save(); } }
+  function showOverlay(icon,title,description,button) {
+    el("overlayIcon").textContent=icon;
+    el("overlayTitle").textContent=title;
+    el("overlayText").textContent=description;
+    el("overlayBtn").textContent=button;
+    el("overlay").hidden=false;
+  }
+  function hideOverlay() { el("overlay").hidden=true; }
+  function setPhase(next) { phase=next;updateHUD(); }
+  function newGame() {
+    score=0;level=1;lives=3;particles=[];trail=[];
+    paddle.w=diff[config.difficulty].paddle;paddle.x=W/2;
+    buildBricks();parkBall();setPhase("ready");
+    showOverlay("🚀","Připraven?","Táhni prstem po herní ploše a ovládej pálku. Rozbij všechny barevné kostky!","Spustit hru");
+    config.games++;save();
+  }
+  function launch() {
+    if(phase!=="ready") return;
+    const a=(Math.random()-.5)*.7;
+    const speed=currentSpeed();
+    ball.vx=Math.sin(a)*speed;ball.vy=-Math.cos(a)*speed;
+    setPhase("playing");hideOverlay();playTone(540,110,"sine",.045);
+  }
+  function nextLevel() {
+    level++;config.levels++;save();
+    buildBricks();parkBall();setPhase("ready");
+    showOverlay("⚡","Úroveň "+level,"Míček bude rychlejší. Dokážeš vyčistit i další řadu?","Pokračovat");
+  }
+  function finishLevel() {
+    if(phase!=="playing") return;
+    setPhase("levelup");
+    score+=level*100;recordScore();updateHUD();
+    for(let i=0;i<10;i++) burst(Math.random()*W,80+Math.random()*H*.4,palettes[config.theme].rows[i%6],12);
+    playTone(800,220,"triangle",.06);
+    showOverlay("🏆","Všechny kostky!","Bonus "+(level*100)+" bodů · skóre "+score.toLocaleString("cs-CZ"),"Další úroveň");
+  }
+  function loseLife() {
+    if(phase!=="playing") return;
+    lives--;playTone(145,280,"sawtooth",.035);burst(ball.x,H-9,"#ff6485",25);
+    if(lives===0) {
+      setPhase("gameover");recordScore();
+      showOverlay("💔","Konec hry","Získal jsi "+score.toLocaleString("cs-CZ")+" bodů. Nejlepší skóre: "+config.best.toLocaleString("cs-CZ")+".","Hrát znovu");
+    } else {
+      parkBall();setPhase("ready");
+      showOverlay("❤️","Zbývá "+lives+" život"+(lives===1?"":"y"),"Nic se neděje, zkus to znovu!","Odpálit míček");
+    }
+  }
+  function pause() {
+    if(phase==="playing") {
+      setPhase("paused");showOverlay("⏸","Pauza","Hra čeká, až budeš připravený.","Pokračovat");
+    } else if(phase==="paused") {
+      setPhase("playing");hideOverlay();lastFrame=performance.now();
+    } else if(phase==="ready") launch();
+  }
+  function pressMain() {
+    if(phase==="ready") launch();
+    else if(phase==="paused") pause();
+    else if(phase==="levelup") nextLevel();
+    else if(phase==="gameover") newGame();
+  }
+
+  function physicsStep(dt) {
+    if(phase!=="playing") return;
+    const ox=ball.x,oy=ball.y;
+    ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;
+    if(ball.x-ball.r<5) {ball.x=5+ball.r;ball.vx=Math.abs(ball.vx);playTone(210,35);}
+    if(ball.x+ball.r>W-5) {ball.x=W-5-ball.r;ball.vx=-Math.abs(ball.vx);playTone(210,35);}
+    if(ball.y-ball.r<7) {ball.y=7+ball.r;ball.vy=Math.abs(ball.vy);playTone(220,35);}
+    const padLeft=paddle.x-paddle.w/2;
+    if(ball.vy>0 && oy+ball.r<=PADDLE_Y+4 && ball.y+ball.r>=PADDLE_Y &&
+       ball.x+ball.r>=padLeft && ball.x-ball.r<=padLeft+paddle.w && ball.y-ball.r<=PADDLE_Y+PADDLE_H) {
+      ball.y=PADDLE_Y-ball.r;
+      const offset=clamp((ball.x-paddle.x)/(paddle.w/2),-1,1);
+      const angle=offset*.98;
+      const speed=clamp(Math.hypot(ball.vx,ball.vy)*1.008,currentSpeed(),500);
+      ball.vx=Math.sin(angle)*speed;
+      ball.vy=-Math.max(Math.cos(angle)*speed,speed*.45);
+      playTone(400,65,"triangle",.045);
+    }
+    for(let i=0;i<bricks.length;i++) {
+      const b=bricks[i];if(!b.alive) continue;
+      const closestX=clamp(ball.x,b.x,b.x+b.w),closestY=clamp(ball.y,b.y,b.y+b.h);
+      const dx=ball.x-closestX,dy=ball.y-closestY;
+      if(dx*dx+dy*dy>ball.r*ball.r) continue;
+      b.alive=false;
+      const color=palettes[config.theme].rows[b.row];
+      score+=(ROWS-b.row)*10;recordScore();updateHUD();burst(b.x+b.w/2,b.y+b.h/2,color,8);
+      const fromLeft=ox+ball.r<=b.x,fromRight=ox-ball.r>=b.x+b.w;
+      if(fromLeft||fromRight) {ball.vx=-ball.vx;ball.x=fromLeft?b.x-ball.r:b.x+b.w+ball.r;}
+      else {ball.vy=-ball.vy;ball.y=oy;}
+      playTone(340+b.row*65,58,"sine",.04);
+      if(bricks.every(block=>!block.alive)) finishLevel();
+      break;
+    }
+    if(ball.y-ball.r>H+3) loseLife();
+  }
+  function roundRect(x,y,w,h,r,fill) {
+    ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
+  }
+  function draw(ts) {
+    const p=palettes[config.theme];
+    const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,p.a);bg.addColorStop(1,p.b);
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    const glow=ctx.createRadialGradient(W*.5,H*.53,30,W*.5,H*.53,280);
+    glow.addColorStop(0,"#ffffff09");glow.addColorStop(1,"#ffffff00");
+    ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+    for(const s of stars) {
+      ctx.globalAlpha=.18+.17*Math.sin(ts*.0013+s.t);ctx.fillStyle="#d8ecff";
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    for(const b of bricks) {
+      if(!b.alive) continue;
+      const color=p.rows[b.row];
+      ctx.shadowColor=color;ctx.shadowBlur=8;
+      roundRect(b.x,b.y,b.w,b.h,3,color);
+      ctx.shadowBlur=0;
+      roundRect(b.x+2,b.y+2,b.w-4,4,2,"#ffffff66");
+      roundRect(b.x+3,b.y+b.h-4,b.w-6,2,1,"#00000019");
+    }
+    for(const pt of trail) {
+      ctx.globalAlpha=pt.life*.26;ctx.fillStyle=p.paddle;
+      ctx.beginPath();ctx.arc(pt.x,pt.y,ball.r*pt.life,0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    for(const part of particles) {
+      ctx.globalAlpha=Math.max(0,Math.min(1,part.life));ctx.fillStyle=part.color;
+      ctx.beginPath();ctx.arc(part.x,part.y,part.r,0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    ctx.shadowBlur=16;ctx.shadowColor=p.paddle;
+    roundRect(paddle.x-paddle.w/2,PADDLE_Y,paddle.w,PADDLE_H,6,p.paddle);
+    ctx.shadowBlur=0;
+    roundRect(paddle.x-paddle.w/2+4,PADDLE_Y+2,paddle.w-8,3,2,p.stroke);
+    ctx.shadowBlur=15;ctx.shadowColor="#ffffff";
+    ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle="#ffffff33";ctx.fillRect(20,H-13,W-40,1);
+  }
+  function tick(ts) {
+    const dt=lastFrame?Math.min((ts-lastFrame)/1000,.035):0;
+    lastFrame=ts;
+    if(phase==="playing") {
+      // Podkroky brání proletění míčku skrz úzké kostky.
+      const parts=Math.max(1,Math.ceil(dt/.006));
+      for(let i=0;i<parts;i++) physicsStep(dt/parts);
+      trail.unshift({x:ball.x,y:ball.y,life:1});if(trail.length>9) trail.pop();
+    } else if(phase==="ready") parkBall();
+    trail.forEach(t=>t.life-=dt*3);
+    trail=trail.filter(t=>t.life>0);
+    for(const p of particles) {p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=90*dt;p.life-=dt*1.45;}
+    particles=particles.filter(p=>p.life>0);
+    draw(ts);
+    requestAnimationFrame(tick);
+  }
+  function pointerPosition(e) {
+    const rect=cv.getBoundingClientRect();
+    const px=(e.clientX-rect.left)*W/rect.width;
+    paddle.x=clamp(px,paddle.w/2+5,W-paddle.w/2-5);
+    if(phase==="ready") parkBall();
+  }
+  cv.addEventListener("pointerdown",(e)=>{e.preventDefault();pointerPosition(e);
+    try{cv.setPointerCapture(e.pointerId);}catch(_){} if(phase==="ready") launch();
+  },{passive:false});
+  cv.addEventListener("pointermove",(e)=>{e.preventDefault();pointerPosition(e);},{passive:false});
+  document.addEventListener("keydown",(e)=>{
+    if(!el("settingsModal").hidden) return;
+    if(e.key==="ArrowLeft") {paddle.x=clamp(paddle.x-25,paddle.w/2,W-paddle.w/2);e.preventDefault();}
+    if(e.key==="ArrowRight") {paddle.x=clamp(paddle.x+25,paddle.w/2,W-paddle.w/2);e.preventDefault();}
+    if(e.key===" "||e.key==="Enter") {e.preventDefault();pressMain();}
+    if(e.key.toLowerCase()==="p"||e.key==="Escape") {e.preventDefault();pause();}
+  });
+  document.addEventListener("visibilitychange",()=>{if(document.hidden&&phase==="playing") pause();});
+  el("overlayBtn").addEventListener("click",pressMain);
+  el("pauseBtn").addEventListener("click",pause);
+  el("newBtn").addEventListener("click",newGame);
+
+  function refreshSettings() {
+    for(const b of document.querySelectorAll("[data-difficulty]"))
+      b.classList.toggle("active",b.dataset.difficulty===config.difficulty);
+    for(const b of document.querySelectorAll("[data-theme]"))
+      b.classList.toggle("active",b.dataset.theme===config.theme);
+    el("soundBtn").classList.toggle("on",config.sound);
+    el("soundBtn").textContent=config.sound?"Zapnuto":"Vypnuto";
+    el("best").textContent=config.best.toLocaleString("cs-CZ");
+  }
+  function openSettings() {
+    oldPhaseForModal=phase;
+    if(phase==="playing") pause();
+    el("settingsModal").hidden=false;refreshSettings();
+  }
+  function closeSettings() {
+    el("settingsModal").hidden=true;oldPhaseForModal=null;
+    confirmReset=false;el("resetBest").textContent="Vynulovat rekord";
+    save();
+  }
+  el("settingsBtn").addEventListener("click",openSettings);
+  el("settingsClose").addEventListener("click",closeSettings);
+  for(const b of document.querySelectorAll("[data-difficulty]")) b.addEventListener("click",()=>{
+    if(config.difficulty===b.dataset.difficulty) return;
+    config.difficulty=b.dataset.difficulty;
+    closeSettings();newGame();save();
+  });
+  for(const b of document.querySelectorAll("[data-theme]")) b.addEventListener("click",()=>{
+    config.theme=b.dataset.theme;refreshSettings();save();
+  });
+  el("soundBtn").addEventListener("click",()=>{
+    config.sound=!config.sound;refreshSettings();save();playTone(620,95);
+  });
+  el("resetBest").addEventListener("click",()=>{
+    if(!confirmReset) {confirmReset=true;el("resetBest").textContent="Opravdu vynulovat? Klepni znovu";return;}
+    config.best=0;confirmReset=false;save();refreshSettings();
+    el("resetBest").textContent="✓ Rekord vynulován";
+  });
+
+  buildBricks();parkBall();updateHUD();refreshSettings();
+  showOverlay("🚀","Připraven?","Táhni prstem po herní ploše a ovládej pálku. Rozbij všechny barevné kostky!","Spustit hru");
+  requestAnimationFrame(tick);
+  
+document.getElementById("updateStatus").textContent="Webová verze se aktualizuje automaticky.";
+
+
+</script>
+</body>
+</html>

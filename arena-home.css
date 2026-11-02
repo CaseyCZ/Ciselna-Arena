@@ -201,6 +201,13 @@
   background:#264570;
 }
 
+/* Five top-level links can exceed the available width on small tablets. */
+@media (min-width:761px) and (max-width:1050px){
+  .arena-home .lobby-header{flex-wrap:wrap;justify-content:center}
+  .arena-home .lobby-header .site-navigation{flex:0 0 100%;justify-content:center;gap:8px}
+  .arena-home .lobby-header .server-state{margin-left:auto}
+}
+
 /* Homepage text follows the existing Běžná / Větší / Největší preference.
    Raise the smallest defaults without scaling the game-board geometry. */
 .arena-home .lobby-intro .welcome,
