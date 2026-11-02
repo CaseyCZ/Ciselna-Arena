@@ -1,4 +1,4 @@
-import {ONLINE_CONFIG} from './online-config.js?v=0.2.73';
+import {ONLINE_CONFIG} from './online-config.js?v=0.2.74';
 
 const board=document.getElementById('leaderboard');
 const panel=document.getElementById('leaderboardPanel');

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync,existsSync} from 'node:fs';
+import {readFileSync,existsSync,statSync} from 'node:fs';
 import {Script,runInNewContext} from 'node:vm';
 
 const html=readFileSync(new URL('../oddechove-hry/prsi.html',import.meta.url),'utf8');
@@ -28,7 +28,7 @@ test('Webová verze má správně doplněný Scriptable HTML kód',()=>{
   assert.match(html,/localStorage\.setItem\('prsi_deluxe_v1'/);
   assert.match(html,/\.hand \.playing-card:disabled\{opacity:1;/);
   assert.doesNotMatch(html,/id="checkUpdatesButton"|id="updateStatus"|function checkWebUpdates/);
-  assert.equal(version.version,'0.1.3');
+  assert.equal(version.version,'0.1.4');
 });
 
 test('Vzhled karet lze přepínat a všech 32 klasických obrázků je uloženo lokálně',()=>{
@@ -42,7 +42,13 @@ test('Vzhled karet lze přepínat a všech 32 klasických obrázků je uloženo 
   assert.match(html,/commons\.wikimedia\.org\/wiki\/File:Doppeldeutsche_Preference\.JPG/);
   const settings=html.slice(html.indexOf('id="settingsOverlay"'),html.indexOf('id="rulesOverlay"'));
   assert.doesNotMatch(settings,/FUZxxl|Wikimedia|creativecommons\.org/);
-  for(const card of engine.deck())assert.ok(existsSync(new URL('../oddechove-hry/assets/prsi-classic/'+card.id+'.webp',import.meta.url)),card.id);
+  assert.match(html,/\.\/assets\/prsi-restored\//);
+  assert.doesNotMatch(html,/\.\/assets\/prsi-classic\//);
+  for(const card of engine.deck()){
+    const url=new URL('../oddechove-hry/assets/prsi-restored/'+card.id+'.webp',import.meta.url);
+    assert.ok(existsSync(url),card.id);
+    assert.ok(statSync(url).size>4000,'Restaurovaná karta má obsah: '+card.id);
+  }
 });
 
 test('Animace rozdávání a odhazování lze v Nastavení vypnout a volba se ukládá',()=>{

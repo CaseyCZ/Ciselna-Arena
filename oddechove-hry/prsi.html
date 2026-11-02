@@ -107,7 +107,7 @@ body[data-animations="off"] .hand .playing-card.allowed:active{transform:none}
   <div class="setting"><label>Vzhled karet</label><div class="choices"><button class="choice" data-card-style="modern">🎨 Moderní</button><button class="choice" data-card-style="classic">🃏 Klasické dvouhlavé</button></div></div>
   <div class="setting toggle-row"><span>Zvuky</span><button id="soundButton" class="choice" style="flex:0 0 95px">Zapnuto</button></div>
   <div class="setting toggle-row"><span>Animace karet</span><button id="animationButton" class="choice" style="flex:0 0 95px">Zapnuto</button></div>
-  <p class="version">Prší Deluxe v0.1.3 • Hra offline bez registrace</p>
+  <p class="version">Prší Deluxe v0.1.4 • Hra offline bez registrace</p>
 </section></div>
 <div id="rulesOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle"><div class="modal-header"><h2 id="rulesTitle">📖 Jak hrát</h2><button class="close" data-close="rulesOverlay" aria-label="Zavřít">×</button></div><ol class="rules"><li>Hraje se s <strong>32 mariášovými kartami</strong>, každý dostane čtyři. Vyhrává ten, kdo se první zbaví všech karet.</li><li>Pokládej kartu stejné <strong>barvy nebo hodnoty</strong> jako poslední vyložená karta.</li><li><strong>Sedmička</strong> znamená +2 karty. Další sedmičkou lze trest přenést a navýšit.</li><li><strong>Eso</strong> znamená „stojíš“. Můžeš ho přebít svým esem.</li><li><strong>Svršek</strong> můžeš položit na libovolnou kartu kromě rozehrané sedmičky nebo esa a zvolíš další barvu.</li><li>Když nemáš co zahrát, <strong>lízneš jednu kartu</strong> a tah končí. Po vyčerpání balíčku se odložené karty promíchají.</li></ol><p class="rules-credit">Ilustrace karet: <a href="https://commons.wikimedia.org/wiki/File:Doppeldeutsche_Preference.JPG" target="_blank" rel="noopener noreferrer">FUZxxl / Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a></p></section></div>
 <div id="logOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="logTitle"><div class="modal-header"><h2 id="logTitle">☷ Záznam hry</h2><button class="close" data-close="logOverlay" aria-label="Zavřít">×</button></div><ol id="logList" class="log-list"></ol></section></div>
@@ -266,7 +266,7 @@ function cardHTML(card,enabled,button=true,effect='',delay=0){
   const corners='<span class="corner"><span>'+rank+'</span>'+suitIcon(card.suit)+'</span>';
   const bottom='<span class="corner bottom"><span>'+rank+'</span>'+suitIcon(card.suit)+'</span>';
   const center='<span class="big-suit">'+suitIcon(card.suit)+'</span>';
-  const face=classic?'<img class="classic-art" src="./assets/prsi-classic/'+card.suit+'-'+card.rank+'.webp" alt="" decoding="async">':
+  const face=classic?'<img class="classic-art" src="./assets/prsi-restored/'+card.suit+'-'+card.rank+'.webp" alt="" decoding="async">':
     corners+center+bottom+(rankLabel[card.rank]?'<span class="rank-name">'+rankLabel[card.rank]+'</span>':'');
   if(!button)return '<div class="'+classes+'" role="img" aria-label="'+label+'">'+face+'</div>';
   return '<button class="'+classes+'"'+animationStyle+' type="button" data-card="'+card.id+'" aria-label="'+label+'" '+(!enabled?'disabled':'')+'>'+face+'</button>';

@@ -1,7 +1,12 @@
 // Single source of visible application version and release notes.
 // Keep package.json in sync; tests verify they match.
-export const APP_VERSION = '0.2.73';
+export const APP_VERSION = '0.2.74';
 export const RELEASE_HISTORY = Object.freeze([
+  {
+    version: '0.2.74',
+    date: '2. 11. 2026',
+    description: 'Prší Deluxe: všech 32 klasických dvouhlavých mariášových karet nahradila sjednocená digitálně vyčištěná sada podle tradičních originálů. Postavy, barvy a symboly zůstávají věrné původnímu vzhledu, bez fotografického zkreslení.'
+  },
   {
     version: '0.2.73',
     date: '2. 11. 2026',
