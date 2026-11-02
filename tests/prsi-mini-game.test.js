@@ -28,18 +28,34 @@ test('Webová verze má správně doplněný Scriptable HTML kód',()=>{
   assert.match(html,/localStorage\.setItem\('prsi_deluxe_v1'/);
   assert.match(html,/\.hand \.playing-card:disabled\{opacity:1;/);
   assert.doesNotMatch(html,/id="checkUpdatesButton"|id="updateStatus"|function checkWebUpdates/);
-  assert.equal(version.version,'0.1.2');
+  assert.equal(version.version,'0.1.3');
 });
 
 test('Vzhled karet lze přepínat a všech 32 klasických obrázků je uloženo lokálně',()=>{
   assert.match(html,/data-card-style="modern"/);
   assert.match(html,/data-card-style="classic"/);
-  assert.match(html,/cardStyle:'modern'/);
+  assert.match(html,/cardStyle:'classic'/);
+  assert.match(html,/cardStyleDefaultV2!==true/);
   assert.match(html,/state\.cardStyle=button\.dataset\.cardStyle/);
   assert.match(html,/card\.suit\+'-'\+card\.rank\+'\.webp"/);
-  assert.match(html,/\.hand \.playing-card\.allowed\{border-color:#12334c/);
+  assert.match(html,/\.hand \.playing-card\.allowed\{border-color:#f5f0de;box-shadow:0 0 0 4px #55efcd/);
   assert.match(html,/commons\.wikimedia\.org\/wiki\/File:Doppeldeutsche_Preference\.JPG/);
+  const settings=html.slice(html.indexOf('id="settingsOverlay"'),html.indexOf('id="rulesOverlay"'));
+  assert.doesNotMatch(settings,/FUZxxl|Wikimedia|creativecommons\.org/);
   for(const card of engine.deck())assert.ok(existsSync(new URL('../oddechove-hry/assets/prsi-classic/'+card.id+'.webp',import.meta.url)),card.id);
+});
+
+test('Animace rozdávání a odhazování lze v Nastavení vypnout a volba se ukládá',()=>{
+  assert.match(html,/animations:true/);
+  assert.match(html,/id="animationButton"/);
+  assert.match(html,/state\.animations=!state\.animations;render\(\)/);
+  assert.match(html,/document\.body\.dataset\.animations=state\.animations\?'on':'off'/);
+  assert.match(html,/@keyframes card-deal/);
+  assert.match(html,/@keyframes backcard-deal/);
+  assert.match(html,/@keyframes card-discard/);
+  assert.match(html,/body\[data-animations="off"\] \.dealt/);
+  assert.match(html,/previousHandIds=new Set\(\)/);
+  assert.match(html,/animateDiscard=Boolean\(previousCard\)/);
 });
 
 test('Balíček obsahuje 32 karet a na začátku má každý čtyři',()=>{

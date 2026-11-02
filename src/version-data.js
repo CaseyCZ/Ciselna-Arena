@@ -1,7 +1,12 @@
 // Single source of visible application version and release notes.
 // Keep package.json in sync; tests verify they match.
-export const APP_VERSION = '0.2.72';
+export const APP_VERSION = '0.2.73';
 export const RELEASE_HISTORY = Object.freeze([
+  {
+    version: '0.2.73',
+    date: '2. 11. 2026',
+    description: 'Prší Deluxe nyní používá jako výchozí klasické dvouhlavé karty, zvýraznění hratelné karty má čistý tyrkysový rámeček a v Nastavení lze vypnout animace rozdávání a zahrání karet. Údaje o licenci karet jsou přesunuty k Pravidlům.'
+  },
   {
     version: '0.2.72',
     date: '2. 11. 2026',
