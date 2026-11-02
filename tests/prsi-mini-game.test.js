@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,existsSync} from 'node:fs';
 import {Script,runInNewContext} from 'node:vm';
 
 const html=readFileSync(new URL('../oddechove-hry/prsi.html',import.meta.url),'utf8');
@@ -27,8 +27,19 @@ test('Webová verze má správně doplněný Scriptable HTML kód',()=>{
   assert.match(html,/localStorage\.getItem\('prsi_deluxe_v1'\)/);
   assert.match(html,/localStorage\.setItem\('prsi_deluxe_v1'/);
   assert.match(html,/\.hand \.playing-card:disabled\{opacity:1;/);
-  assert.match(html,/id="checkUpdatesButton"/);
-  assert.equal(version.version,'0.1.1');
+  assert.doesNotMatch(html,/id="checkUpdatesButton"|id="updateStatus"|function checkWebUpdates/);
+  assert.equal(version.version,'0.1.2');
+});
+
+test('Vzhled karet lze přepínat a všech 32 klasických obrázků je uloženo lokálně',()=>{
+  assert.match(html,/data-card-style="modern"/);
+  assert.match(html,/data-card-style="classic"/);
+  assert.match(html,/cardStyle:'modern'/);
+  assert.match(html,/state\.cardStyle=button\.dataset\.cardStyle/);
+  assert.match(html,/card\.suit\+'-'\+card\.rank\+'\.webp"/);
+  assert.match(html,/\.hand \.playing-card\.allowed\{border-color:#12334c/);
+  assert.match(html,/commons\.wikimedia\.org\/wiki\/File:Doppeldeutsche_Preference\.JPG/);
+  for(const card of engine.deck())assert.ok(existsSync(new URL('../oddechove-hry/assets/prsi-classic/'+card.id+'.webp',import.meta.url)),card.id);
 });
 
 test('Balíček obsahuje 32 karet a na začátku má každý čtyři',()=>{

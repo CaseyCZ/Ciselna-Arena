@@ -48,10 +48,12 @@ body[data-theme="blue"] .table{background:radial-gradient(ellipse at 50% 36%,var
 .hand{display:flex;align-items:flex-end;justify-content:center;width:max-content;min-width:100%;padding:0 12px 5px;min-height:calc(var(--card-w) * 1.5 + 15px)}
 .hand .playing-card{flex:0 0 var(--card-w);margin-left:-8px;transition:transform .16s,border-color .16s,box-shadow .16s;position:relative}
 .hand .playing-card:first-child{margin-left:0}
-.hand .playing-card.allowed{box-shadow:0 0 0 2px #ffe3a3,0 7px 17px #0023187d}
+.hand .playing-card.allowed{border-color:#12334c;box-shadow:0 0 0 3px #09283f,0 0 0 6px #67e9cd,0 7px 17px #0023187d}
 .hand .playing-card.allowed:active{transform:translateY(-15px) scale(1.06)}
 .hand .playing-card:disabled{opacity:1;cursor:default}
 .playing-card{width:var(--card-w);aspect-ratio:.7;position:relative;flex-shrink:0;display:block;padding:0;border-radius:10px;border:3px solid #f8e8c6;color:var(--ink);background:linear-gradient(125deg,#fffdf5,#f2e9d3);box-shadow:0 5px 14px #00231888;overflow:hidden;text-align:center}
+.playing-card.classic{background:#f5f2e9;border-color:#f5f0de}
+.playing-card .classic-art{display:block;width:100%;height:100%;object-fit:fill}
 .playing-card.suit-hearts{--ink:#c6303c}.playing-card.suit-bells{--ink:#d19122}.playing-card.suit-leaves{--ink:#398054}.playing-card.suit-acorns{--ink:#664a2e}
 .playing-card .corner{position:absolute;display:flex;flex-direction:column;align-items:center;gap:0;left:5px;top:4px;font-weight:950;font-size:16px;line-height:1;z-index:1}.playing-card .corner.bottom{left:auto;top:auto;right:5px;bottom:4px;transform:rotate(180deg)}
 .playing-card .corner svg{width:12px;height:13px}.playing-card .big-suit{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);width:53%;height:55%;display:grid;place-items:center}.playing-card .big-suit svg{width:100%;height:100%;filter:drop-shadow(0 2px 1px #0002)}
@@ -67,9 +69,9 @@ body[data-theme="blue"] .table{background:radial-gradient(ellipse at 50% 36%,var
 .modal .emoji{font-size:43px}.modal .button{width:100%;margin:4px 0}.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.modal-header h2{margin:0}.close{background:#ffffff1c;border:1px solid #ffffff29;border-radius:10px;color:#fff;width:37px;height:37px;font-size:20px}
 .setting{text-align:left;margin:17px 0}.setting label{display:block;color:#e0d7b8;font-size:12px;font-weight:900;margin-bottom:8px}
 .choices{display:flex;gap:7px}.choice{flex:1;min-height:42px;border:1px solid #638877;border-radius:11px;background:#23493f;color:#d6e5d9;font-size:12px;font-weight:800;padding:8px 5px}.choice.selected{background:#dec18b;border-color:#ffe1a2;color:#26372d}
+.setting .credit{margin:8px 0 0;font-size:10px;line-height:1.5;color:#b5c9bf}.setting .credit a{color:#f0d9a9;text-underline-offset:2px}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:13px;font-weight:800;color:#d9dfd1}
 .version{font-size:11px;color:#91b2a6;margin-top:18px}.rules{text-align:left;font-size:12px;line-height:1.55;color:#d7e5d9}.rules li{margin:7px 0}.log-list{margin:0;padding-left:18px;text-align:left;color:#d7e5d9;font-size:12px;line-height:1.75}
-.update-status{font-size:12px;line-height:1.5;color:#c7dfd0;text-align:left;margin:7px 0 10px}.update-check{width:100%;min-height:44px}
 :root{--card-w:clamp(82px,19vw,115px)}
 @media(max-width:400px){:root{--card-w:clamp(55px,19vw,76px)}.table{min-height:355px}.app{gap:8px;padding-left:9px;padding-right:9px}.center-zone{min-height:138px}.opponent-zone{padding-top:12px}.player-zone{padding-bottom:11px}.hand{padding-left:3px;padding-right:3px}.hand .playing-card{margin-left:-6px}.playing-card .corner{font-size:14px}}
 @media(max-width:400px){.identity .logo{display:none}.top{gap:6px}.tools{gap:5px}}
@@ -89,7 +91,14 @@ body[data-theme="blue"] .table{background:radial-gradient(ellipse at 50% 36%,var
 </main>
 <div id="suitOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="suitTitle"><div class="emoji">🃏</div><h2 id="suitTitle">Zvol barvu</h2><p>Svršek můžeš položit na libovolnou kartu. Jakou barvu má hrát počítač?</p><div id="suitChoices" class="choices"></div><button id="cancelSuit" class="button secondary">Zrušit</button></section></div>
 <div id="resultOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div id="resultEmoji" class="emoji">🏆</div><h2 id="resultTitle">Vyhrál jsi!</h2><p id="resultText"></p><button id="playAgain" class="button">Hrát znovu</button></section></div>
-<div id="settingsOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="modal-header"><h2 id="settingsTitle">⚙️ Nastavení</h2><button id="closeSettings" class="close" aria-label="Zavřít">×</button></div><div class="setting"><label>Obtížnost počítače</label><div class="choices"><button class="choice" data-difficulty="easy">Lehká</button><button class="choice" data-difficulty="normal">Střední</button><button class="choice" data-difficulty="hard">Těžká</button></div></div><div class="setting"><label>Vzhled stolu</label><div class="choices"><button class="choice" data-theme="green">🟢 Zelený</button><button class="choice" data-theme="blue">🔵 Modrý</button></div></div><div class="setting toggle-row"><span>Zvuky</span><button id="soundButton" class="choice" style="flex:0 0 95px">Zapnuto</button></div><div class="setting"><label>Aktualizace</label><p id="updateStatus" class="update-status" role="status">Používáš webovou verzi 0.1.1. Nové verze se při otevření hry kontrolují automaticky.</p><button id="checkUpdatesButton" class="button secondary update-check">🔄 Zkontrolovat aktualizace</button></div><p class="version">Prší Deluxe v0.1.1 • Hra offline bez registrace</p></section></div>
+<div id="settingsOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="modal-header"><h2 id="settingsTitle">⚙️ Nastavení</h2><button id="closeSettings" class="close" aria-label="Zavřít">×</button></div>
+  <div class="setting"><label>Obtížnost počítače</label><div class="choices"><button class="choice" data-difficulty="easy">Lehká</button><button class="choice" data-difficulty="normal">Střední</button><button class="choice" data-difficulty="hard">Těžká</button></div></div>
+  <div class="setting"><label>Vzhled stolu</label><div class="choices"><button class="choice" data-theme="green">🟢 Zelený</button><button class="choice" data-theme="blue">🔵 Modrý</button></div></div>
+  <div class="setting"><label>Vzhled karet</label><div class="choices"><button class="choice" data-card-style="modern">🎨 Moderní</button><button class="choice" data-card-style="classic">🃏 Klasické dvouhlavé</button></div><p class="credit">Klasické karty: foto <a href="https://commons.wikimedia.org/wiki/File:Doppeldeutsche_Preference.JPG" target="_blank" rel="noopener noreferrer">FUZxxl / Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0</a> (oříznuté a zmenšené).</p></div>
+  <div class="setting toggle-row"><span>Zvuky</span><button id="soundButton" class="choice" style="flex:0 0 95px">Zapnuto</button></div>
+  <p class="version">Prší Deluxe v0.1.2 • Hra offline bez registrace</p>
+</section></div>
 <div id="rulesOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle"><div class="modal-header"><h2 id="rulesTitle">📖 Jak hrát</h2><button class="close" data-close="rulesOverlay" aria-label="Zavřít">×</button></div><ol class="rules"><li>Hraje se s <strong>32 mariášovými kartami</strong>, každý dostane čtyři. Vyhrává ten, kdo se první zbaví všech karet.</li><li>Pokládej kartu stejné <strong>barvy nebo hodnoty</strong> jako poslední vyložená karta.</li><li><strong>Sedmička</strong> znamená +2 karty. Další sedmičkou lze trest přenést a navýšit.</li><li><strong>Eso</strong> znamená „stojíš“. Můžeš ho přebít svým esem.</li><li><strong>Svršek</strong> můžeš položit na libovolnou kartu kromě rozehrané sedmičky nebo esa a zvolíš další barvu.</li><li>Když nemáš co zahrát, <strong>lízneš jednu kartu</strong> a tah končí. Po vyčerpání balíčku se odložené karty promíchají.</li></ol></section></div>
 <div id="logOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="logTitle"><div class="modal-header"><h2 id="logTitle">☷ Záznam hry</h2><button class="close" data-close="logOverlay" aria-label="Zavřít">×</button></div><ol id="logList" class="log-list"></ol></section></div>
 <script>
@@ -193,10 +202,11 @@ const engine = (() => {
 
 const el=id=>document.getElementById(id);
 const stored=(()=>{try{return JSON.parse(localStorage.getItem('prsi_deluxe_v1')||'{}');}catch(_){return {};}})();
-const defaults={difficulty:'normal',theme:'green',sound:true,wins:[0,0],rounds:0,game:null};
+const defaults={difficulty:'normal',theme:'green',cardStyle:'modern',sound:true,wins:[0,0],rounds:0,game:null};
 const state={...defaults,...stored};
 if(!['easy','normal','hard'].includes(state.difficulty))state.difficulty='normal';
 if(!['green','blue'].includes(state.theme))state.theme='green';
+if(!['modern','classic'].includes(state.cardStyle))state.cardStyle='modern';
 if(!Array.isArray(state.wins)||state.wins.length!==2||!state.wins.every(n=>Number.isInteger(n)&&n>=0))state.wins=[0,0];
 if(!Number.isSafeInteger(state.rounds)||state.rounds<0)state.rounds=0;
 if(!validGame(state.game))state.game=engine.start();
@@ -235,11 +245,13 @@ const rankLabel={U:'Spodek',O:'Svršek',K:'Král',A:'Eso'};
 function cardHTML(card,enabled,button=true){
   const rank=rankShort[card.rank]||card.rank;
   const label=engine.cardName(card);
-  const classes='playing-card suit-'+card.suit+(enabled?' allowed':'');
+  const classic=state.cardStyle==='classic';
+  const classes='playing-card suit-'+card.suit+(classic?' classic':'')+(enabled?' allowed':'');
   const corners='<span class="corner"><span>'+rank+'</span>'+suitIcon(card.suit)+'</span>';
   const bottom='<span class="corner bottom"><span>'+rank+'</span>'+suitIcon(card.suit)+'</span>';
   const center='<span class="big-suit">'+suitIcon(card.suit)+'</span>';
-  const face=corners+center+bottom+(rankLabel[card.rank]?'<span class="rank-name">'+rankLabel[card.rank]+'</span>':'');
+  const face=classic?'<img class="classic-art" src="./assets/prsi-classic/'+card.suit+'-'+card.rank+'.webp" alt="" decoding="async">':
+    corners+center+bottom+(rankLabel[card.rank]?'<span class="rank-name">'+rankLabel[card.rank]+'</span>':'');
   if(!button)return '<div class="'+classes+'" role="img" aria-label="'+label+'">'+face+'</div>';
   return '<button class="'+classes+'" type="button" data-card="'+card.id+'" aria-label="'+label+'" '+(!enabled?'disabled':'')+'>'+face+'</button>';
 }
@@ -273,6 +285,7 @@ function render(){
   document.body.dataset.theme=state.theme;
   for(const button of document.querySelectorAll('[data-difficulty]'))button.classList.toggle('selected',button.dataset.difficulty===state.difficulty);
   for(const button of document.querySelectorAll('[data-theme]'))button.classList.toggle('selected',button.dataset.theme===state.theme);
+  for(const button of document.querySelectorAll('[data-card-style]'))button.classList.toggle('selected',button.dataset.cardStyle===state.cardStyle);
   el('soundButton').textContent=state.sound?'Zapnuto':'Vypnuto';
   save();
 }
@@ -361,23 +374,8 @@ el('closeSettings').addEventListener('click',()=>el('settingsOverlay').hidden=tr
 for(const button of document.querySelectorAll('[data-close]'))button.addEventListener('click',()=>el(button.dataset.close).hidden=true);
 for(const button of document.querySelectorAll('[data-difficulty]'))button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;render();});
 for(const button of document.querySelectorAll('[data-theme]'))button.addEventListener('click',()=>{state.theme=button.dataset.theme;render();});
+for(const button of document.querySelectorAll('[data-card-style]'))button.addEventListener('click',()=>{state.cardStyle=button.dataset.cardStyle;render();});
 el('soundButton').addEventListener('click',()=>{state.sound=!state.sound;render();});
-async function checkWebUpdates(){
-  const button=el('checkUpdatesButton'),status=el('updateStatus');
-  button.disabled=true;button.textContent='⏳ Kontroluji…';
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),7000);
-  try{
-    const response=await fetch('./prsi-version.json?t='+Date.now(),{cache:'no-store',signal:controller.signal});
-    if(!response.ok)throw Error('HTTP '+response.status);
-    const info=await response.json();
-    if(!info||typeof info.version!=='string'||!/^\d+\.\d+\.\d+$/.test(info.version))throw Error('Neplatná verze');
-    const current='0.1.1'.split('.').map(Number),latest=info.version.split('.').map(Number);
-    const newer=latest.some((number,i)=>number!==current[i]&&latest.slice(0,i).every((value,j)=>value===current[j])&&number>current[i]);
-    status.textContent=newer?'🔔 Nová verze '+info.version+' je dostupná. Obnov stránku, až nebudeš mít rozehranou partii.':'✅ Používáš aktuální verzi '+current.join('.')+'.';
-  }catch(_){status.textContent='🌐 Aktualizace nyní nelze ověřit. Hru můžeš dál používat offline.';}
-  finally{clearTimeout(timer);button.disabled=false;button.textContent='🔄 Zkontrolovat aktualizace';}
-}
-el('checkUpdatesButton').addEventListener('click',checkWebUpdates);
 for(const id of ['settingsOverlay','rulesOverlay','logOverlay'])el(id).addEventListener('click',event=>{if(event.target===el(id))el(id).hidden=true;});
-render();scheduleAI();checkWebUpdates();
+render();scheduleAI();
 </script></body></html>

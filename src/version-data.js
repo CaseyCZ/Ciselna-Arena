@@ -1,7 +1,12 @@
 // Single source of visible application version and release notes.
 // Keep package.json in sync; tests verify they match.
-export const APP_VERSION = '0.2.71';
+export const APP_VERSION = '0.2.72';
 export const RELEASE_HISTORY = Object.freeze([
+  {
+    version: '0.2.72',
+    date: '2. 11. 2026',
+    description: 'Prší Deluxe: v Nastavení lze volit moderní nebo klasické dvouhlavé mariášové karty, hratelné karty mají výraznější tmavé zvýraznění a z Nastavení zmizela ruční kontrola webových aktualizací.'
+  },
   {
     version: '0.2.71',
     date: '2. 11. 2026',
