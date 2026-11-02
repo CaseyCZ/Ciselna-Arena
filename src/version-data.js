@@ -1,7 +1,12 @@
 // Single source of visible application version and release notes.
 // Keep package.json in sync; tests verify they match.
-export const APP_VERSION = '0.2.70';
+export const APP_VERSION = '0.2.71';
 export const RELEASE_HISTORY = Object.freeze([
+  {
+    version: '0.2.71',
+    date: '2. 11. 2026',
+    description: 'Do Oddechových her přibylo Prší Deluxe proti počítači. Webová hra zachovává pravidla a vzhled ze Scriptable, funguje na mobilu, tabletu i PC a ukládá partii přímo v prohlížeči.'
+  },
   {
     version: '0.2.70',
     date: '2. 11. 2026',

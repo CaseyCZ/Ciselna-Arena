@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0b1930">
-  <meta name="description" content="Oddechové hry v Číselné aréně: Piškvorky Deluxe, Pong Fotbal a Breakout Deluxe.">
+  <meta name="description" content="Oddechové hry v Číselné aréně: Piškvorky Deluxe, Pong Fotbal, Breakout Deluxe a Prší Deluxe.">
   <link rel="icon" href="../assets/arena-icon.png" type="image/png">
   <title>Oddechové hry – Číselná aréna</title>
   <style>
@@ -23,7 +23,7 @@
     .eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;color:#ffd38a}
     h1{margin:8px 0 9px;color:#ffdfa6;font-size:clamp(30px,5vw,46px)}
     .intro p{max-width:650px;margin:0 auto;color:#bdd0e7;line-height:1.6;font-size:15px}
-    .games{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:19px}
+    .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:19px}
     .game{display:flex;flex-direction:column;overflow:hidden;border:1px solid #3e638e;border-radius:19px;background:linear-gradient(150deg,#19375d,#0e2240);box-shadow:0 18px 36px #02091580}
     .preview{display:block;width:100%;height:auto;aspect-ratio:760/420;object-fit:contain;background:#0b1b35}
     .info{display:flex;flex-direction:column;gap:11px;flex:1;padding:20px}
@@ -45,7 +45,7 @@
     <div class="intro">
       <div class="eyebrow">ČÍSELNÁ ARÉNA</div>
       <h1>🎮 Oddechové hry</h1>
-      <p>Tři malé hry pro chvíle odpočinku. Vyber si, na co máš chuť, a hraj na mobilu, tabletu nebo počítači.</p>
+      <p>Čtyři malé hry pro chvíle odpočinku. Vyber si, na co máš chuť, a hraj na mobilu, tabletu nebo počítači.</p>
     </div>
     <section class="games" aria-label="Výběr oddechových her">
       <article class="game">
@@ -73,6 +73,15 @@
           <h2>Breakout Deluxe</h2>
           <p>Rozbíjej barevné kostky, postupuj úrovněmi a zkus překonat svůj rekord.</p>
           <a class="play" href="./breakout.html" aria-label="Hrát Breakout Deluxe">Hrát Breakout →</a>
+        </div>
+      </article>
+      <article class="game">
+        <img class="preview" src="./prsi.svg" alt="Náhled karetní hry Prší Deluxe" width="760" height="420">
+        <div class="info">
+          <span class="tag">KARETNÍ HRA · 1 HRÁČ</span>
+          <h2>🃏 Prší Deluxe</h2>
+          <p>Klasické české Prší proti počítači. Sedmičky, esa, svršky, tři obtížnosti a vlastní karetní stůl.</p>
+          <a class="play" href="./prsi.html" aria-label="Hrát Prší Deluxe">Hrát Prší →</a>
         </div>
       </article>
     </section>

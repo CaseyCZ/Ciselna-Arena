@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="cs"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0e2925">
+<meta name="description" content="Prší Deluxe – klasická česká karetní hra proti počítači. Hraj zdarma v Číselné aréně na mobilu, tabletu a počítači.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../assets/arena-icon.png" type="image/png">
+<title>Prší Deluxe – Číselná aréna</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif;color:#f8f6e9;background:#081d1a}
+body{--felt:#11543d;--felt-light:#1c7955;--gold:#f3d799;--border:#426b60;
+margin:0;min-height:100dvh;background:radial-gradient(ellipse at 50% -10%,#235745 0%,transparent 58%),linear-gradient(150deg,#0e2925,#071813);color:#f8f6e9}
+body[data-theme="blue"]{--felt:#194968;--felt-light:#276a90;--gold:#f5d7a4;--border:#3e748d;background:radial-gradient(ellipse at 50% -10%,#244f70,transparent 58%),linear-gradient(150deg,#102b42,#081522)}
+button,select{font:inherit}button{cursor:pointer;touch-action:manipulation}button:focus-visible,select:focus-visible{outline:3px solid #ffe0a1;outline-offset:3px}
+[hidden]{display:none!important}
+.app{width:min(100%,820px);min-height:100dvh;margin:auto;padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 18px);display:flex;flex-direction:column;gap:11px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:49px}
+.identity{display:flex;align-items:center;gap:11px;min-width:0}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#c88d48,#86431b);border:1px solid #f5cf88;display:grid;place-items:center;font-size:28px;box-shadow:0 6px 20px #0004}
+h1{font-size:21px;line-height:1.1;margin:0;letter-spacing:-.7px}.sub{font-size:10px;letter-spacing:1.7px;font-weight:800;color:#dcc38d;margin-top:5px}
+.tools{display:flex;gap:8px}.iconbtn{width:45px;height:45px;border:1px solid var(--border);border-radius:13px;background:#214539;color:#fff3d7;font-size:22px}
+.arena-back{width:45px;height:45px;display:grid;place-items:center;border:1px solid var(--border);border-radius:13px;background:#214539;color:#ffe2a6;font-size:23px;font-weight:850;text-decoration:none}
+.arena-back:focus-visible{outline:3px solid #ffe0a1;outline-offset:3px}
+.scores{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;border:1px solid #4c796b;background:#153b33cb;border-radius:15px;padding:8px 13px}
+.player{min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}.player strong{font-size:12px;color:#f0e1b7}.player span{font-size:11px;color:#aacabc}
+.score{font-size:21px;color:#ffe09c;font-weight:900;font-variant-numeric:tabular-nums}.versus{font-weight:900;font-size:12px;color:#94b4a8}
+.table{flex:1;position:relative;display:flex;flex-direction:column;justify-content:space-between;align-items:center;min-height:395px;max-height:750px;overflow:hidden;border:2px solid #9e754b;border-radius:24px;background:radial-gradient(ellipse at 50% 36%,var(--felt-light) 0%,var(--felt) 60%,#0b352b 100%);box-shadow:inset 0 0 0 6px #163b31a0,inset 0 0 42px #032016a6,0 12px 36px #0006}
+body[data-theme="blue"] .table{background:radial-gradient(ellipse at 50% 36%,var(--felt-light),var(--felt) 60%,#0b2e44)}
+.table:before{content:"";position:absolute;inset:0;opacity:.15;pointer-events:none;background:repeating-linear-gradient(25deg,transparent 0,transparent 7px,#ffffff14 8px,#ffffff04 9px)}
+.opponent-zone,.center-zone,.player-zone{position:relative;z-index:1;width:100%;display:flex;align-items:center;justify-content:center}
+.opponent-zone{flex-direction:column;gap:7px;padding-top:16px}.opponent-label{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:850;color:#f2ebd0}
+.turn-marker{font-size:10px;color:#083b2a;background:#ffda90;border-radius:999px;padding:4px 8px;font-weight:900;white-space:nowrap}
+.opponent-hand{display:flex;padding-left:22px;min-height:64px;justify-content:center;align-items:flex-start}
+.backcard{width:48px;aspect-ratio:0.7;border-radius:7px;margin-left:-22px;border:3px solid #f5e4bb;background:repeating-linear-gradient(45deg,#aa492d 0,#aa492d 5px,#d78559 5px,#d78559 8px);box-shadow:0 4px 8px #03261f77,0 0 0 1px #603b27;transform:rotate(var(--rotate));display:grid;place-items:center}
+.backcard:after{content:"✦";font-size:20px;color:#f5e4bb;width:30px;height:44px;border:1px solid #f5e4bb;display:grid;place-items:center;background:#873c2b66}
+.center-zone{flex:1;gap:clamp(16px,7vw,62px);padding:8px 12px 0;min-height:155px}
+.pile{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:95px}.pile-label{font-size:11px;font-weight:800;color:#d3e2d2;white-space:nowrap;text-shadow:0 1px 3px #0007}
+.deck-wrap{position:relative}.deck-wrap:before,.deck-wrap:after{content:"";position:absolute;inset:3px 0 0 3px;background:#f7edd5;border:1px solid #aa8758;border-radius:10px;transform:translate(4px,3px)}
+.deck-wrap:after{transform:translate(2px,1px)}
+.deck{position:relative;z-index:1;display:grid;place-items:center;width:var(--card-w);aspect-ratio:.7;border:5px solid #fbecd0;border-radius:10px;color:#fff4d2;background:repeating-linear-gradient(45deg,#aa4b38,#aa4b38 5px,#ce8157 5px,#ce8157 9px);box-shadow:0 5px 15px #00231960}
+.deck-inner{width:76%;height:80%;border:2px solid #f8dcaf;display:grid;place-items:center;font-size:30px;background:#8b362db3}
+.deck:disabled{opacity:.54;cursor:default}.deck-count{font-size:10px;color:#d7e4d5}
+.discard{position:relative;min-height:calc(var(--card-w) * 1.43)}.discard .playing-card{cursor:default;transform:rotate(-7deg)}
+.active-suit{border:1px solid #e8d4a1a6;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:850;color:#fce6b9;background:#143c34d9;min-height:26px}
+.player-zone{flex-direction:column;gap:4px;padding:0 0 15px;min-height:165px}
+.hand-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:850;color:#f7efd6}.hand-scroller{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:14px 9px 10px;scrollbar-width:thin;scrollbar-color:#d3aa7199 transparent}
+.hand{display:flex;align-items:flex-end;justify-content:center;width:max-content;min-width:100%;padding:0 12px 5px;min-height:calc(var(--card-w) * 1.5 + 15px)}
+.hand .playing-card{flex:0 0 var(--card-w);margin-left:-8px;transition:transform .16s,border-color .16s,box-shadow .16s;position:relative}
+.hand .playing-card:first-child{margin-left:0}
+.hand .playing-card.allowed{box-shadow:0 0 0 2px #ffe3a3,0 7px 17px #0023187d}
+.hand .playing-card.allowed:active{transform:translateY(-15px) scale(1.06)}
+.hand .playing-card:disabled{opacity:1;cursor:default}
+.playing-card{width:var(--card-w);aspect-ratio:.7;position:relative;flex-shrink:0;display:block;padding:0;border-radius:10px;border:3px solid #f8e8c6;color:var(--ink);background:linear-gradient(125deg,#fffdf5,#f2e9d3);box-shadow:0 5px 14px #00231888;overflow:hidden;text-align:center}
+.playing-card.suit-hearts{--ink:#c6303c}.playing-card.suit-bells{--ink:#d19122}.playing-card.suit-leaves{--ink:#398054}.playing-card.suit-acorns{--ink:#664a2e}
+.playing-card .corner{position:absolute;display:flex;flex-direction:column;align-items:center;gap:0;left:5px;top:4px;font-weight:950;font-size:16px;line-height:1;z-index:1}.playing-card .corner.bottom{left:auto;top:auto;right:5px;bottom:4px;transform:rotate(180deg)}
+.playing-card .corner svg{width:12px;height:13px}.playing-card .big-suit{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);width:53%;height:55%;display:grid;place-items:center}.playing-card .big-suit svg{width:100%;height:100%;filter:drop-shadow(0 2px 1px #0002)}
+.playing-card .rank-name{position:absolute;bottom:16%;left:0;right:0;font-size:9px;font-weight:850;color:#866d55;white-space:nowrap}
+.playing-card:disabled{cursor:default}
+.controls{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;min-height:45px}
+.button{min-height:44px;padding:10px 15px;border:1px solid #d8b777;border-radius:12px;background:linear-gradient(135deg,#ffedbe,#dfb56c);color:#382d21;font-size:13px;font-weight:900;box-shadow:0 3px 8px #0003}
+.button.secondary{background:#1e4538;color:#f6e8c8;border-color:#548776}.button:disabled{opacity:.5;cursor:default}
+.status{text-align:center;font-size:13px;font-weight:850;color:#f7edcb;min-height:23px}.hint{text-align:center;font-size:11px;color:#a5c1b5;line-height:1.4;min-height:16px}
+.overlay{position:fixed;z-index:5;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:#02120fce;backdrop-filter:blur(7px)}
+.modal{width:min(400px,100%);max-height:90dvh;overflow-y:auto;border:1px solid #b89460;background:linear-gradient(150deg,#24483d,#102d27);border-radius:22px;padding:23px;box-shadow:0 20px 60px #000a;text-align:center}
+.modal h2{margin:3px 0 10px;color:#ffe0a6;font-size:24px}.modal p{font-size:13px;color:#cfdfd2;line-height:1.55;margin:0 0 16px}
+.modal .emoji{font-size:43px}.modal .button{width:100%;margin:4px 0}.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.modal-header h2{margin:0}.close{background:#ffffff1c;border:1px solid #ffffff29;border-radius:10px;color:#fff;width:37px;height:37px;font-size:20px}
+.setting{text-align:left;margin:17px 0}.setting label{display:block;color:#e0d7b8;font-size:12px;font-weight:900;margin-bottom:8px}
+.choices{display:flex;gap:7px}.choice{flex:1;min-height:42px;border:1px solid #638877;border-radius:11px;background:#23493f;color:#d6e5d9;font-size:12px;font-weight:800;padding:8px 5px}.choice.selected{background:#dec18b;border-color:#ffe1a2;color:#26372d}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:13px;font-weight:800;color:#d9dfd1}
+.version{font-size:11px;color:#91b2a6;margin-top:18px}.rules{text-align:left;font-size:12px;line-height:1.55;color:#d7e5d9}.rules li{margin:7px 0}.log-list{margin:0;padding-left:18px;text-align:left;color:#d7e5d9;font-size:12px;line-height:1.75}
+.update-status{font-size:12px;line-height:1.5;color:#c7dfd0;text-align:left;margin:7px 0 10px}.update-check{width:100%;min-height:44px}
+:root{--card-w:clamp(82px,19vw,115px)}
+@media(max-width:400px){:root{--card-w:clamp(55px,19vw,76px)}.table{min-height:355px}.app{gap:8px;padding-left:9px;padding-right:9px}.center-zone{min-height:138px}.opponent-zone{padding-top:12px}.player-zone{padding-bottom:11px}.hand{padding-left:3px;padding-right:3px}.hand .playing-card{margin-left:-6px}.playing-card .corner{font-size:14px}}
+@media(max-width:400px){.identity .logo{display:none}.top{gap:6px}.tools{gap:5px}}
+@media(max-height:690px){:root{--card-w:75px}.table{min-height:335px}.app{gap:6px;padding-top:calc(env(safe-area-inset-top) + 6px)}.opponent-zone{padding-top:8px}.player-zone{padding-bottom:7px;min-height:130px}.hand{min-height:120px}.hand-scroller{padding:7px 5px}.scores{padding:5px}.playing-card .corner{font-size:13px}.playing-card .rank-name{font-size:8px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style></head><body>
+<main class="app">
+  <header class="top"><div class="identity"><div class="logo" aria-hidden="true">🃏</div><div><h1>Prší Deluxe</h1><div class="sub">KARETNÍ HRA • PROTI PC</div></div></div><div class="tools"><a class="arena-back" href="./" aria-label="Zpět na oddechové hry" title="Zpět na oddechové hry">←</a><button id="logButton" class="iconbtn" aria-label="Záznam hry">☷</button><button id="settingsButton" class="iconbtn" aria-label="Nastavení">⚙️</button></div></header>
+  <section class="scores" aria-label="Stav zápasu"><div class="player"><strong>🤖 Počítač</strong><span id="opponentCount">4 karty</span></div><div class="score" aria-label="Výhry"><span id="scoreComputer">0</span><span class="versus"> : </span><span id="scorePlayer">0</span></div><div class="player"><strong>👤 Ty</strong><span id="playerCount">4 karty</span></div></section>
+  <section class="table" aria-label="Herní stůl">
+    <div class="opponent-zone"><div class="opponent-label">Počítač <span id="opponentTurn" class="turn-marker" hidden>NA TAHU</span></div><div id="opponentHand" class="opponent-hand" aria-label="Zakryté karty počítače"></div></div>
+    <div class="center-zone"><div class="pile"><div class="deck-wrap"><button id="drawPile" class="deck" aria-label="Líznout kartu"><span class="deck-inner">✦</span></button></div><div id="stockCount" class="pile-label">Dobírací balíček</div></div><div class="pile"><div id="discardPile" class="discard" aria-label="Poslední zahraná karta"></div><div id="activeSuit" class="active-suit">Srdce</div></div></div>
+    <div class="player-zone"><div class="hand-title">Tvoje karty <span id="playerTurn" class="turn-marker">NA TAHU</span></div><div class="hand-scroller"><div id="playerHand" class="hand" aria-label="Karty v ruce"></div></div></div>
+  </section>
+  <div class="controls"><button id="drawButton" class="button">Líznout kartu</button><button id="newRoundButton" class="button secondary">↻ Nová partie</button><button id="rulesButton" class="button secondary">Pravidla</button></div>
+  <div><div id="status" class="status" role="status" aria-live="polite">Připraveno</div><div id="hint" class="hint">Klepni na zvýrazněnou kartu.</div></div>
+</main>
+<div id="suitOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="suitTitle"><div class="emoji">🃏</div><h2 id="suitTitle">Zvol barvu</h2><p>Svršek můžeš položit na libovolnou kartu. Jakou barvu má hrát počítač?</p><div id="suitChoices" class="choices"></div><button id="cancelSuit" class="button secondary">Zrušit</button></section></div>
+<div id="resultOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div id="resultEmoji" class="emoji">🏆</div><h2 id="resultTitle">Vyhrál jsi!</h2><p id="resultText"></p><button id="playAgain" class="button">Hrát znovu</button></section></div>
+<div id="settingsOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="modal-header"><h2 id="settingsTitle">⚙️ Nastavení</h2><button id="closeSettings" class="close" aria-label="Zavřít">×</button></div><div class="setting"><label>Obtížnost počítače</label><div class="choices"><button class="choice" data-difficulty="easy">Lehká</button><button class="choice" data-difficulty="normal">Střední</button><button class="choice" data-difficulty="hard">Těžká</button></div></div><div class="setting"><label>Vzhled stolu</label><div class="choices"><button class="choice" data-theme="green">🟢 Zelený</button><button class="choice" data-theme="blue">🔵 Modrý</button></div></div><div class="setting toggle-row"><span>Zvuky</span><button id="soundButton" class="choice" style="flex:0 0 95px">Zapnuto</button></div><div class="setting"><label>Aktualizace</label><p id="updateStatus" class="update-status" role="status">Používáš webovou verzi 0.1.1. Nové verze se při otevření hry kontrolují automaticky.</p><button id="checkUpdatesButton" class="button secondary update-check">🔄 Zkontrolovat aktualizace</button></div><p class="version">Prší Deluxe v0.1.1 • Hra offline bez registrace</p></section></div>
+<div id="rulesOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle"><div class="modal-header"><h2 id="rulesTitle">📖 Jak hrát</h2><button class="close" data-close="rulesOverlay" aria-label="Zavřít">×</button></div><ol class="rules"><li>Hraje se s <strong>32 mariášovými kartami</strong>, každý dostane čtyři. Vyhrává ten, kdo se první zbaví všech karet.</li><li>Pokládej kartu stejné <strong>barvy nebo hodnoty</strong> jako poslední vyložená karta.</li><li><strong>Sedmička</strong> znamená +2 karty. Další sedmičkou lze trest přenést a navýšit.</li><li><strong>Eso</strong> znamená „stojíš“. Můžeš ho přebít svým esem.</li><li><strong>Svršek</strong> můžeš položit na libovolnou kartu kromě rozehrané sedmičky nebo esa a zvolíš další barvu.</li><li>Když nemáš co zahrát, <strong>lízneš jednu kartu</strong> a tah končí. Po vyčerpání balíčku se odložené karty promíchají.</li></ol></section></div>
+<div id="logOverlay" class="overlay" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="logTitle"><div class="modal-header"><h2 id="logTitle">☷ Záznam hry</h2><button class="close" data-close="logOverlay" aria-label="Zavřít">×</button></div><ol id="logList" class="log-list"></ol></section></div>
+<script>
+// ENGINE BEGIN — čistá herní pravidla; lze je testovat i mimo Scriptable.
+const engine = (() => {
+  const suits = [
+    { id: 'hearts', name: 'Srdce', mark: '♥' },
+    { id: 'bells', name: 'Kule', mark: '●' },
+    { id: 'leaves', name: 'Zelené', mark: '♣' },
+    { id: 'acorns', name: 'Žaludy', mark: '♠' },
+  ];
+  const ranks = ['7','8','9','10','U','O','K','A'];
+  const rankNames = {'7':'Sedmička','8':'Osmička','9':'Devítka','10':'Desítka','U':'Spodek','O':'Svršek','K':'Král','A':'Eso'};
+  const suitName = id => suits.find(s => s.id === id)?.name || id;
+  const cardName = card => rankNames[card.rank] + ' – ' + suitName(card.suit);
+  const deck = () => suits.flatMap(suit => ranks.map(rank => ({id:suit.id+'-'+rank,suit:suit.id,rank})));
+  function shuffle(cards,random=Math.random) {
+    const result = cards.slice();
+    for(let i=result.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}
+    return result;
+  }
+  function start(random=Math.random,starter=0){
+    const stock=shuffle(deck(),random), hands=[[],[]];
+    for(let i=0;i<4;i++){hands[0].push(stock.pop());hands[1].push(stock.pop());}
+    // Počáteční karta bez speciálního účinku.
+    const idx=stock.findIndex(card=>['8','9','10','U','K'].includes(card.rank));
+    const initial=stock.splice(idx,1)[0];
+    return {stock,discard:[initial],hands,current:starter,activeSuit:initial.suit,pending:null,winner:null,history:[]};
+  }
+  const top = game => game.discard[game.discard.length-1];
+  function canPlay(game,card) {
+    if(!card||game.winner!==null)return false;
+    if(game.pending?.type==='seven')return card.rank==='7';
+    if(game.pending?.type==='ace')return card.rank==='A';
+    return card.rank==='O'||card.rank===top(game).rank||card.suit===game.activeSuit;
+  }
+  const legal=(game,player)=>game.winner===null&&game.current===player?game.hands[player].filter(card=>canPlay(game,card)):[];
+  function record(game,entry){game.history.unshift(entry);if(game.history.length>30)game.history.length=30;}
+  function play(game,player,id,chosenSuit) {
+    if(game.winner!==null||game.current!==player)return false;
+    const idx=game.hands[player].findIndex(card=>card.id===id);
+    if(idx<0||!canPlay(game,game.hands[player][idx]))return false;
+    const card=game.hands[player][idx];
+    if(card.rank==='O'&&!suits.some(suit=>suit.id===chosenSuit))return false;
+    game.hands[player].splice(idx,1);game.discard.push(card);
+    game.activeSuit=card.rank==='O'?chosenSuit:card.suit;
+    if(card.rank==='7')game.pending={type:'seven',count:(game.pending?.type==='seven'?game.pending.count:0)+2};
+    else if(card.rank==='A')game.pending={type:'ace'};
+    else game.pending=null;
+    record(game,{player,type:'play',card,chosenSuit:card.rank==='O'?chosenSuit:null});
+    if(game.hands[player].length===0)game.winner=player;
+    game.current=1-player;
+    return true;
+  }
+  function refill(game,random){
+    if(game.stock.length||game.discard.length<=1)return;
+    const last=game.discard.pop();game.stock=shuffle(game.discard,random);game.discard=[last];
+  }
+  function draw(game,player,random=Math.random){
+    if(game.winner!==null||game.current!==player)return null;
+    if(game.pending?.type==='ace'){
+      game.pending=null;game.current=1-player;record(game,{player,type:'skip'});return {type:'skip',count:0};
+    }
+    // Dobírání je běžně povolené až tehdy, když nemáš vhodnou kartu;
+    // trest sedmičky můžeš přijmout i v případě, že máš další sedmičku.
+    if(!game.pending&&legal(game,player).length)return null;
+    const total=game.pending?.type==='seven'?game.pending.count:1;
+    let count=0;
+    for(let i=0;i<total;i++){refill(game,random);if(!game.stock.length)break;game.hands[player].push(game.stock.pop());count++;}
+    game.pending=null;game.current=1-player;record(game,{player,type:'draw',count});return {type:'draw',count};
+  }
+  function bestSuit(hand){
+    return suits.map(suit=>({id:suit.id,count:hand.filter(card=>card.suit===suit.id).length})).sort((a,b)=>b.count-a.count)[0].id;
+  }
+  function aiMove(game,difficulty='normal',random=Math.random){
+    if(game.current!==1||game.winner!==null)return null;
+    const cards=legal(game,1);
+    if(!cards.length)return {type:game.pending?.type==='ace'?'skip':'draw'};
+    const hand=game.hands[1];let pick;
+    if(difficulty==='easy')pick=cards[Math.floor(random()*cards.length)];
+    else{
+      const opponents=game.hands[0].length;
+      pick=cards.map(card=>{
+        const rest=hand.filter(other=>other.id!==card.id);
+        const same=rest.filter(other=>other.suit===card.suit).length;
+        let score=same*3;
+        if(card.rank==='O')score+=opponents<=2?12:-14;
+        if(card.rank==='7')score+=opponents<=3?14:-3;
+        if(card.rank==='A')score+=opponents<=2?11:-2;
+        if(card.rank!=='O'&&card.suit===game.activeSuit)score+=2;
+        if(rest.length===0)score+=100;
+        if(difficulty==='normal')score+=(random()-.5)*7;
+        return {card,score};
+      }).sort((a,b)=>b.score-a.score)[0].card;
+    }
+    return {type:'play',id:pick.id,chosenSuit:pick.rank==='O'?bestSuit(hand.filter(card=>card.id!==pick.id)):null};
+  }
+  return {suits,ranks,cardName,deck,shuffle,start,top,canPlay,legal,play,draw,bestSuit,aiMove};
+})();
+// ENGINE END
+
+const el=id=>document.getElementById(id);
+const stored=(()=>{try{return JSON.parse(localStorage.getItem('prsi_deluxe_v1')||'{}');}catch(_){return {};}})();
+const defaults={difficulty:'normal',theme:'green',sound:true,wins:[0,0],rounds:0,game:null};
+const state={...defaults,...stored};
+if(!['easy','normal','hard'].includes(state.difficulty))state.difficulty='normal';
+if(!['green','blue'].includes(state.theme))state.theme='green';
+if(!Array.isArray(state.wins)||state.wins.length!==2||!state.wins.every(n=>Number.isInteger(n)&&n>=0))state.wins=[0,0];
+if(!Number.isSafeInteger(state.rounds)||state.rounds<0)state.rounds=0;
+if(!validGame(state.game))state.game=engine.start();
+let statusText='',chosenCard=null,aiTimer=null,confirmNew=false;
+document.body.dataset.theme=state.theme;
+
+function validGame(game){
+  if(!game||typeof game!=='object'||!Array.isArray(game.stock)||!Array.isArray(game.discard)||
+    !Array.isArray(game.hands)||game.hands.length!==2||!game.hands.every(Array.isArray)||
+    !game.discard.length||![0,1].includes(game.current)||!engine.suits.some(s=>s.id===game.activeSuit)||
+    (game.winner!==null&&game.winner!==0&&game.winner!==1))return false;
+  const cards=[...game.stock,...game.discard,...game.hands[0],...game.hands[1]];
+  const ids=new Set(engine.deck().map(c=>c.id));
+  return cards.length===32&&new Set(cards.map(c=>c.id)).size===32&&cards.every(c=>ids.has(c.id));
+}
+function save(){try{localStorage.setItem('prsi_deluxe_v1',JSON.stringify(state));}catch(_){}}
+function tone(freq=520,duration=.075){
+  if(!state.sound)return;
+  try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=window._prsiAudio||(window._prsiAudio=new C()),osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type='sine';osc.frequency.value=freq;gain.gain.value=.07;gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+duration);
+    osc.connect(gain);gain.connect(ctx.destination);osc.start();osc.stop(ctx.currentTime+duration);
+  }catch(_){}
+}
+function suitIcon(suit){
+  const path={
+    hearts:'<path d="M50 87C28 70 9 51 9 33C9 13 33 7 50 27C67 7 91 13 91 33C91 51 72 70 50 87Z"/>',
+    bells:'<path d="M50 14C38 14 30 25 30 40V57L20 71Q18 77 25 77H75Q82 77 80 71L70 57V40C70 25 62 14 50 14Z"/><path d="M37 79Q50 96 63 79"/><circle cx="50" cy="12" r="6"/>',
+    leaves:'<path d="M48 84Q20 71 18 44Q15 20 46 13Q42 34 65 39Q90 41 83 62Q76 83 48 84Z"/><path d="M26 85Q51 72 74 30" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>',
+    acorns:'<path d="M50 35C27 35 20 48 25 66Q31 86 50 90Q69 86 75 66C80 48 73 35 50 35Z"/><path d="M20 49Q24 27 50 27Q76 27 80 49Q50 64 20 49Z"/><path d="M50 28Q44 17 51 10Q57 5 61 12" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>'
+  };
+  return '<svg viewBox="0 0 100 100" aria-hidden="true" fill="currentColor">'+path[suit]+'</svg>';
+}
+const rankShort={U:'J',O:'S',K:'K',A:'A'};
+const rankLabel={U:'Spodek',O:'Svršek',K:'Král',A:'Eso'};
+function cardHTML(card,enabled,button=true){
+  const rank=rankShort[card.rank]||card.rank;
+  const label=engine.cardName(card);
+  const classes='playing-card suit-'+card.suit+(enabled?' allowed':'');
+  const corners='<span class="corner"><span>'+rank+'</span>'+suitIcon(card.suit)+'</span>';
+  const bottom='<span class="corner bottom"><span>'+rank+'</span>'+suitIcon(card.suit)+'</span>';
+  const center='<span class="big-suit">'+suitIcon(card.suit)+'</span>';
+  const face=corners+center+bottom+(rankLabel[card.rank]?'<span class="rank-name">'+rankLabel[card.rank]+'</span>':'');
+  if(!button)return '<div class="'+classes+'" role="img" aria-label="'+label+'">'+face+'</div>';
+  return '<button class="'+classes+'" type="button" data-card="'+card.id+'" aria-label="'+label+'" '+(!enabled?'disabled':'')+'>'+face+'</button>';
+}
+function plural(n){return n===1?'karta':n>=2&&n<=4?'karty':'karet';}
+function render(){
+  const game=state.game,own=game.current===0&&game.winner===null;
+  const legal=engine.legal(game,0),canDraw=own&&(game.pending!==null||legal.length===0);
+  el('scoreComputer').textContent=state.wins[1];el('scorePlayer').textContent=state.wins[0];
+  el('opponentCount').textContent=game.hands[1].length+' '+plural(game.hands[1].length);
+  el('playerCount').textContent=game.hands[0].length+' '+plural(game.hands[0].length);
+  el('opponentTurn').hidden=game.current!==1||game.winner!==null;
+  el('playerTurn').hidden=!own;
+  el('opponentHand').innerHTML=game.hands[1].map((_,i)=>'<span class="backcard" style="--rotate:'+(i%2?3:-3)+'deg" aria-hidden="true"></span>').join('');
+  el('playerHand').innerHTML=game.hands[0].map((card,i)=>cardHTML(card,own&&engine.canPlay(game,card))).join('');
+  const recent=game.discard[game.discard.length-1];
+  el('discardPile').innerHTML=cardHTML(recent,false,false);
+  const chosen=engine.suits.find(s=>s.id===game.activeSuit);
+  el('activeSuit').textContent=(recent.rank==='O'?'Zvolená barva: ':'Barva: ')+chosen.name;
+  el('stockCount').textContent=game.stock.length+' '+plural(game.stock.length)+' v balíčku';
+  el('drawPile').disabled=!canDraw;
+  el('drawButton').disabled=!canDraw;
+  el('drawButton').textContent=game.pending?.type==='ace'?'Stojím':game.pending?.type==='seven'?'Líznout '+game.pending.count+' karty':'Líznout kartu';
+  if(game.winner!==null){el('status').textContent=game.winner===0?'🏆 Vyhrál jsi!':'🤖 Vyhrál počítač';el('hint').textContent='Zahraj si další partii.';}
+  else if(statusText)el('status').textContent=statusText;
+  else el('status').textContent=own?'Jsi na tahu':'Počítač přemýšlí…';
+  if(game.winner===null){
+    el('hint').textContent=game.pending?.type==='seven'?(own?'Přebij sedmičkou, nebo si lízni '+game.pending.count+' karet.':'Počítač řeší sedmičku…'):
+      game.pending?.type==='ace'?(own?'Přebij esem, nebo vynech tah.':'Počítač musí stát nebo přebít esem.'):
+      own?(legal.length?'Klepni na zvýrazněnou kartu.':'Nemáš vhodnou kartu. Lízni jednu.'):'Chvilku strpení.';
+  }
+  document.body.dataset.theme=state.theme;
+  for(const button of document.querySelectorAll('[data-difficulty]'))button.classList.toggle('selected',button.dataset.difficulty===state.difficulty);
+  for(const button of document.querySelectorAll('[data-theme]'))button.classList.toggle('selected',button.dataset.theme===state.theme);
+  el('soundButton').textContent=state.sound?'Zapnuto':'Vypnuto';
+  save();
+}
+function completedMove(previousPlayer,previousCard){
+  const game=state.game;
+  statusText=previousCard?((previousPlayer===0?'Zahrál jsi: ':'Počítač zahrál: ')+engine.cardName(previousCard)):'';
+  if(game.winner!==null){
+    state.wins[game.winner]++;
+    el('resultEmoji').textContent=game.winner===0?'🏆':'🃏';
+    el('resultTitle').textContent=game.winner===0?'Vyhrál jsi!':'Tentokrát vyhrál počítač';
+    el('resultText').textContent='Stav výher: '+state.wins[0]+' : '+state.wins[1]+'. Dáme další partii?';
+    el('resultOverlay').hidden=false;tone(game.winner===0?880:285,.18);
+  }else{tone(previousPlayer===0?650:390);}
+  render();scheduleAI();
+}
+function playHuman(id,suit){
+  if(!engine.play(state.game,0,id,suit))return;
+  const card=engine.top(state.game);el('suitOverlay').hidden=true;chosenCard=null;completedMove(0,card);
+}
+function drawHuman(){
+  if(state.game.current!==0||state.game.winner!==null)return;
+  const result=engine.draw(state.game,0);
+  if(!result)return;
+  statusText=result.type==='skip'?'Stojíš. Teď hraje počítač.':result.count?'Líznul jsi '+result.count+' '+plural(result.count)+'.':'Balíček je prázdný. Tah předán.';
+  tone(330);render();scheduleAI();
+}
+function scheduleAI(){
+  if(aiTimer!==null){clearTimeout(aiTimer);aiTimer=null;}
+  if(state.game.current!==1||state.game.winner!==null)return;
+  aiTimer=setTimeout(()=>{
+    aiTimer=null;
+    if(state.game.current!==1||state.game.winner!==null)return;
+    const choice=engine.aiMove(state.game,state.difficulty);
+    if(!choice)return;
+    if(choice.type==='play'){
+      if(engine.play(state.game,1,choice.id,choice.chosenSuit))completedMove(1,engine.top(state.game));
+    }else{
+      const result=engine.draw(state.game,1);
+      if(!result)return;
+      statusText=result.type==='skip'?'Počítač stojí.':'Počítač si líznul '+result.count+' '+plural(result.count)+'.';
+      render();tone(410);
+    }
+  },600+Math.random()*450);
+}
+function beginRound(){
+  if(aiTimer!==null){clearTimeout(aiTimer);aiTimer=null;}
+  state.rounds++;state.game=engine.start(Math.random,state.rounds%2===0?1:0);
+  statusText='';chosenCard=null;
+  el('resultOverlay').hidden=true;el('suitOverlay').hidden=true;
+  render();scheduleAI();
+}
+el('playerHand').addEventListener('click',event=>{
+  const button=event.target.closest('[data-card]');
+  if(!button||button.disabled)return;
+  const card=state.game.hands[0].find(item=>item.id===button.dataset.card);
+  if(!card)return;
+  if(card.rank==='O'){
+    chosenCard=card.id;
+    el('suitChoices').innerHTML=engine.suits.map(suit=>'<button class="choice" data-suit="'+suit.id+'">'+suit.mark+' '+suit.name+'</button>').join('');
+    el('suitOverlay').hidden=false;
+  }else playHuman(card.id,null);
+});
+el('suitChoices').addEventListener('click',event=>{
+  const button=event.target.closest('[data-suit]');if(button&&chosenCard)playHuman(chosenCard,button.dataset.suit);
+});
+el('cancelSuit').addEventListener('click',()=>{el('suitOverlay').hidden=true;chosenCard=null;});
+el('drawButton').addEventListener('click',drawHuman);el('drawPile').addEventListener('click',drawHuman);
+el('newRoundButton').addEventListener('click',()=>{
+  if(state.game.winner!==null||window.confirm('Opravdu začít novou partii? Aktuální karty se rozdají znovu.'))beginRound();
+});
+el('playAgain').addEventListener('click',beginRound);
+function showOverlay(id){el(id).hidden=false;}
+el('settingsButton').addEventListener('click',()=>showOverlay('settingsOverlay'));
+el('rulesButton').addEventListener('click',()=>showOverlay('rulesOverlay'));
+el('logButton').addEventListener('click',()=>{
+  const game=state.game;
+  el('logList').innerHTML=game.history.length?game.history.map(action=>{
+    const player=action.player===0?'Ty':'Počítač';
+    const description=action.type==='play'?' zahrál '+engine.cardName(action.card)+(action.chosenSuit?' a změnil barvu na '+engine.suits.find(s=>s.id===action.chosenSuit).name:''):
+      action.type==='skip'?' stojí.':' si líznul '+action.count+' '+plural(action.count)+'.';
+    return '<li>'+player+description+'</li>';
+  }).join(''):'<li>Partie právě začala.</li>';
+  showOverlay('logOverlay');
+});
+el('closeSettings').addEventListener('click',()=>el('settingsOverlay').hidden=true);
+for(const button of document.querySelectorAll('[data-close]'))button.addEventListener('click',()=>el(button.dataset.close).hidden=true);
+for(const button of document.querySelectorAll('[data-difficulty]'))button.addEventListener('click',()=>{state.difficulty=button.dataset.difficulty;render();});
+for(const button of document.querySelectorAll('[data-theme]'))button.addEventListener('click',()=>{state.theme=button.dataset.theme;render();});
+el('soundButton').addEventListener('click',()=>{state.sound=!state.sound;render();});
+async function checkWebUpdates(){
+  const button=el('checkUpdatesButton'),status=el('updateStatus');
+  button.disabled=true;button.textContent='⏳ Kontroluji…';
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),7000);
+  try{
+    const response=await fetch('./prsi-version.json?t='+Date.now(),{cache:'no-store',signal:controller.signal});
+    if(!response.ok)throw Error('HTTP '+response.status);
+    const info=await response.json();
+    if(!info||typeof info.version!=='string'||!/^\d+\.\d+\.\d+$/.test(info.version))throw Error('Neplatná verze');
+    const current='0.1.1'.split('.').map(Number),latest=info.version.split('.').map(Number);
+    const newer=latest.some((number,i)=>number!==current[i]&&latest.slice(0,i).every((value,j)=>value===current[j])&&number>current[i]);
+    status.textContent=newer?'🔔 Nová verze '+info.version+' je dostupná. Obnov stránku, až nebudeš mít rozehranou partii.':'✅ Používáš aktuální verzi '+current.join('.')+'.';
+  }catch(_){status.textContent='🌐 Aktualizace nyní nelze ověřit. Hru můžeš dál používat offline.';}
+  finally{clearTimeout(timer);button.disabled=false;button.textContent='🔄 Zkontrolovat aktualizace';}
+}
+el('checkUpdatesButton').addEventListener('click',checkWebUpdates);
+for(const id of ['settingsOverlay','rulesOverlay','logOverlay'])el(id).addEventListener('click',event=>{if(event.target===el(id))el(id).hidden=true;});
+render();scheduleAI();checkWebUpdates();
+</script></body></html>

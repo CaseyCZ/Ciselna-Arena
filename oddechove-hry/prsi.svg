@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" viewBox="0 0 760 420" role="img" aria-labelledby="title desc">
+  <title id="title">Prší Deluxe</title>
+  <desc id="desc">Zelený karetní stůl s mariášovými kartami, dobíracím balíčkem a kartami hráče</desc>
+  <defs>
+    <radialGradient id="felt" cx="50%" cy="42%" r="72%"><stop stop-color="#267c5a"/><stop offset="1" stop-color="#082f24"/></radialGradient>
+    <linearGradient id="face" x2="0" y2="1"><stop stop-color="#fffdf7"/><stop offset="1" stop-color="#e7dec9"/></linearGradient>
+    <pattern id="back" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="14" fill="#a8472f"/><rect width="6" height="14" fill="#dc9263"/></pattern>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity=".4"/></filter>
+  </defs>
+  <rect width="760" height="420" fill="#061b19"/>
+  <rect x="16" y="16" width="728" height="388" rx="26" fill="#775a35"/>
+  <rect x="24" y="24" width="712" height="372" rx="22" fill="url(#felt)" stroke="#b58b54" stroke-width="3"/>
+  <text x="50" y="69" font-family="system-ui,sans-serif" font-size="25" font-weight="900" fill="#ffe6ad">🃏 PRŠÍ DELUXE</text>
+  <text x="52" y="92" font-family="system-ui,sans-serif" font-size="12" letter-spacing="2" fill="#c8e2d3">KLASICKÉ KARTY • PROTI POČÍTAČI</text>
+  <g filter="url(#shadow)">
+    <g transform="translate(316 42) rotate(-7 44 65)"><rect width="88" height="126" rx="9" fill="url(#back)" stroke="#fce8c6" stroke-width="6"/><rect x="13" y="13" width="62" height="100" rx="4" fill="none" stroke="#ffe6c4" stroke-width="2"/><text x="44" y="77" font-family="serif" font-size="43" text-anchor="middle" fill="#fce8c6">✦</text></g>
+    <g transform="translate(358 42) rotate(5 44 65)"><rect width="88" height="126" rx="9" fill="url(#back)" stroke="#fce8c6" stroke-width="6"/><rect x="13" y="13" width="62" height="100" rx="4" fill="none" stroke="#ffe6c4" stroke-width="2"/><text x="44" y="77" font-family="serif" font-size="43" text-anchor="middle" fill="#fce8c6">✦</text></g>
+  </g>
+  <g filter="url(#shadow)">
+    <g transform="translate(246 168) rotate(-8 44 65)"><rect width="88" height="126" rx="9" fill="url(#back)" stroke="#fce8c6" stroke-width="5"/><rect x="12" y="12" width="64" height="102" rx="3" fill="none" stroke="#ffe6c4" stroke-width="2"/><text x="44" y="77" font-family="serif" font-size="41" text-anchor="middle" fill="#fce8c6">✦</text></g>
+    <g transform="translate(430 162) rotate(6 44 65)"><rect width="88" height="126" rx="9" fill="url(#face)" stroke="#f5e8c8" stroke-width="5"/><text x="14" y="26" font-size="24" font-weight="bold" fill="#bc2636">7</text><path d="M44 92C24 75 10 60 10 48C10 30 31 28 44 44C57 28 78 30 78 48C78 60 64 75 44 92Z" fill="#c83b4a"/><text x="75" y="112" font-size="24" font-weight="bold" fill="#bc2636" transform="rotate(180 75 112)">7</text></g>
+  </g>
+  <g filter="url(#shadow)">
+    <g transform="translate(274 276) rotate(-17 44 65)"><rect width="88" height="126" rx="9" fill="url(#face)" stroke="#f5e8c8" stroke-width="5"/><text x="11" y="24" font-size="23" font-weight="bold" fill="#2b8258">9</text><path d="M40 95Q15 78 21 51Q23 25 51 26Q45 42 63 49Q79 62 63 82Z" fill="#39865f"/></g>
+    <g transform="translate(343 267) rotate(0 44 65)"><rect width="88" height="126" rx="9" fill="url(#face)" stroke="#f5e8c8" stroke-width="5"/><text x="12" y="24" font-size="23" font-weight="bold" fill="#b72d39">A</text><path d="M44 96C20 75 9 58 9 44C9 25 31 24 44 41C57 24 79 25 79 44C79 58 68 75 44 96Z" fill="#c63d4a"/></g>
+    <g transform="translate(412 276) rotate(17 44 65)"><rect width="88" height="126" rx="9" fill="url(#face)" stroke="#f5e8c8" stroke-width="5"/><text x="11" y="24" font-size="23" font-weight="bold" fill="#af7f22">O</text><path d="M44 25Q32 26 32 45V68L23 78H65L56 68V45Q56 26 44 25Z" fill="#d9a338"/><circle cx="44" cy="22" r="6" fill="#d9a338"/></g>
+  </g>
+  <text x="45" y="357" font-family="system-ui,sans-serif" font-size="14" font-weight="800" fill="#e7f2dc">🟡 Jsi na tahu</text>
+  <text x="560" y="360" font-family="system-ui,sans-serif" font-size="12" fill="#b3dfce">Lehká • Střední • Těžká</text>
+</svg>
